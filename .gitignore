@@ -130,9 +130,11 @@ dist
 .pnp.*
 
 # material
-content
 doc
 code
+word
+html
+
 
 # dev-tests & pg
 pg

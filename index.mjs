@@ -3,6 +3,7 @@ import * as https from "https";
 import * as fs from "fs";
 import * as path from "path";
 import * as url from "url"
+import { spawn } from "child_process";
 
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
@@ -21,7 +22,7 @@ const res = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
 const files = res.data;
 
 console.log("====================================");
-console.log(files);
+// console.log(files);
 console.log("====================================");
 
 const downloadUrls = [];
@@ -30,7 +31,7 @@ for (const f of files) {
   downloadUrls.push({ name: f.name, download_url: f.download_url });
 }
 
-console.log({ downloadUrls });
+// console.log({ downloadUrls });
 
 //e.g.
 // "import { ChildProcessWithoutNullStreams } from 'child_process';\n" +
@@ -50,7 +51,7 @@ console.log({ downloadUrls });
 const dir = "code";
 
 const root = path.dirname(url.fileURLToPath(import.meta.url));
-console.log({root});
+// console.log({root});
 const dirPath = path.join(root, dir);
 if (!fs.existsSync(dirPath)) {
   // console.log("DNE");
@@ -63,9 +64,16 @@ for (const o of downloadUrls) {
   fs.writeFile(path.join(dirPath, o.name), result, { encoding: "utf-8" }, (err) => {
     if (err) throw err;
 
-    console.log("File written!");
+    console.log("Code Files written!");
   })
 }
+
+const cProc = spawn("python", ["main.py"] )
+
+cProc.on("error", console.error)
+
+cProc.stdout.pipe(process.stdout)
+cProc.stderr.pipe(process.stderr)
 
 /**
  * @param {string} url

@@ -8,7 +8,7 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
 #  nodemon --exec "clear && py read.py" //DNReload upon .py changes
 # nodemon --ext py --exec "clear && python main.py"
-read_dir_name = 'content'
+read_dir_name = 'code'
 write_dir_name = "word"
 
 def create_docx (f_name: str, content: str) -> None: 
@@ -52,7 +52,10 @@ def create_docx (f_name: str, content: str) -> None:
 
 
 if not os.path.exists(write_dir_name):
-    raise FileNotFoundError(f"Directory does not exist: {write_dir_name}")
+    # raise FileNotFoundError(f"Directory does not exist: {write_dir_name}")
+
+    os.mkdir(write_dir_name)
+    print(f"Dir '{write_dir_name}' created for docx output")
 
 
 for file_name in os.listdir(read_dir_name):
