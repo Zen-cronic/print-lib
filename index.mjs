@@ -47,7 +47,7 @@ console.log({ downloadUrls });
 //     '    return true;\n' +
 //     '};\n'
 
-const dir = "content";
+const dir = "code";
 
 const root = path.dirname(url.fileURLToPath(import.meta.url));
 console.log({root});

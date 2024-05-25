@@ -129,5 +129,15 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# content
+# material
 content
+doc
+code
+
+# dev-tests & pg
+pg
+
+# py related
+.venv
+__pycache__
+requirements.txt
