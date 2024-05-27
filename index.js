@@ -5,39 +5,33 @@
 // import * as url from "url"
 // import { spawn } from "child_process";
 
-// const requireESM = require("esm")(module/*, options*/)
-
-// const { Octokit } = requireESM("octokit");
-require = require("esm")(module);
-const { Octokit } = require("octokit");
+// const { Octokit } = require("octokit");
 const https = require("https");
 const path = require("path");
 const fs = require("fs");
+const {spawn} = require("child_process")
+
+// if(typeof process.env.GITHUB_ACCESS_TOKEN === "undefined"){
+if (!process.env.GITHUB_ACCESS_TOKEN) {
+  throw new Error("Cannot access env vari");
+}
+// console.log(process.env.GITHUB_ACCESS_TOKEN);
+// console.log(process.env.FOO, typeof process.env.FOO === "undefined") //true
 
 module.exports = { printLib };
 
 async function printLib() {
-  const octokit = new Octokit({
-    auth: process.env.GITHUB_ACCESS_TOKEN,
-  });
+  const owner = "gmrchk";
+  const repo = "cli-testing-library";
+  const repoPath = "src";
 
-  const res = await octokit.request(
-    "GET /repos/{owner}/{repo}/contents/{path}",
-    {
-      owner: "gmrchk",
-      repo: "cli-testing-library",
-      path: "src",
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-        Accept: "application/vnd.github+json",
-      },
-    }
-  );
+  const repoUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${repoPath}`;
 
+  const res = await customFetch(repoUrl);
   const files = res.data;
 
   console.log("====================================");
-  // console.log(files);
+  console.log(files);
   console.log("====================================");
 
   const downloadUrls = [];
@@ -45,6 +39,8 @@ async function printLib() {
     // downloadUrls.push({ [f.name]: f.download_url });
     downloadUrls.push({ name: f.name, download_url: f.download_url });
   }
+
+  console.log({ downloadUrls });
 
   // console.log({ downloadUrls });
 
@@ -63,24 +59,19 @@ async function printLib() {
   //     '    return true;\n' +
   //     '};\n'
 
-  // const dir = "code";
-
-  // const root = path.dirname(url.fileURLToPath(import.meta.url));
-  // // console.log({root});
-  // const codeDirname = path.join(root, dir);
-
   const codeDirname = path.join(__dirname, "code");
   if (!fs.existsSync(codeDirname)) {
     // console.log("DNE");
     fs.mkdirSync(codeDirname);
   }
   for (const o of downloadUrls) {
-    const result = await customFetch(o.download_url);
+    const result = await customFetch(o.download_url, true);
     // console.log({result});
 
     fs.writeFile(
       path.join(codeDirname, o.name),
-      result,
+      // result,
+      result.data,
       { encoding: "utf-8" },
       (err) => {
         if (err) throw err;
@@ -99,9 +90,9 @@ async function printLib() {
 }
 
 // test
-async () => {
+(async () => {
   await printLib();
-};
+})();
 
 // curl -L \
 //   -H "Accept: application/vnd.github+json" \
@@ -114,7 +105,7 @@ async () => {
  * @param {string} url
  * @returns
  */
-async function customFetch(url) {
+async function customFetch(url, isText=false) {
   if (typeof url !== "string") {
     throw new TypeError(`URL must be of type string: ${url}`);
   }
@@ -151,9 +142,25 @@ async function customFetch(url) {
               statusText: res.statusMessage,
             };
             reject(error);
+
           } else {
             // console.log({result});
-            resolve(result);
+
+            try {
+              //JSON str
+              result = JSON.parse(result)
+            } catch (error) {
+              //html str or text str
+            }
+
+            const resolved = {
+              data: result, //JSON obj OR html/text str
+              headers: res.headers,
+              status: res.statusCode,
+              statusText: res.statusMessage,
+            };
+
+            resolve(resolved);
           }
         });
 
@@ -169,5 +176,10 @@ async function customFetch(url) {
     req.end();
   });
 
-  return result;
+  // if(!isText){
+    // result.data = JSON.parse(result.data);
+  // }
+ 
+
+  return result
 }
