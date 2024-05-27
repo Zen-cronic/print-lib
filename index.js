@@ -74,34 +74,28 @@ async function printLib() {
       console.error(`Error writing file ${o.name}: ${err}`);
       process.exit(1)
     }
-    //make sync
-    // fs.writeFile(
-    //   path.join(CODE_DIR_PATH, o.name),
-    //   // result,
-    //   result.data,
-    //   { encoding: "utf-8" },
-    //   (err) => {
-    //     if (err) throw err;
-
-    //     console.log("Code Files written!");
-    //   }
-    // );
+    
   }
 
+  //ChildProcessWithoutNullStreams
   const cProc = spawn("python", ["main.py"]);
 
   cProc.on("error", (err) => {
     throw err;
   });
 
-  cProc.stdout.pipe(process.stdout);
+  // cProc.stdout.pipe(process.stdout);
   cProc.stderr.pipe(process.stderr);
+
+  //or else: A worker process has failed to exit gracefully and has been force exited. 
+  //or --detectOpenHandles
+  cProc.unref()
 }
 
 // test
-(async () => {
-  await printLib();
-})();
+// (async () => {
+//   await printLib();
+// })();
 
 // curl -L \
 //   -H "Accept: application/vnd.github+json" \
