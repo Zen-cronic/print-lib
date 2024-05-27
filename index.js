@@ -8,8 +8,8 @@
 // const requireESM = require("esm")(module/*, options*/)
 
 // const { Octokit } = requireESM("octokit");
-require = require("esm")(module)
-const { Octokit } = require("octokit")
+require = require("esm")(module);
+const { Octokit } = require("octokit");
 const https = require("https");
 const path = require("path");
 const fs = require("fs");
@@ -69,7 +69,7 @@ async function printLib() {
   // // console.log({root});
   // const codeDirname = path.join(root, dir);
 
-  const codeDirname = path.join(__dirname, "code")
+  const codeDirname = path.join(__dirname, "code");
   if (!fs.existsSync(codeDirname)) {
     // console.log("DNE");
     fs.mkdirSync(codeDirname);
@@ -99,50 +99,75 @@ async function printLib() {
 }
 
 // test
-(async () => {
+async () => {
   await printLib();
+};
 
-})
+// curl -L \
+//   -H "Accept: application/vnd.github+json" \
+//   -H "Authorization: Bearer <YOUR-TOKEN>" \
+//   -H "X-GitHub-Api-Version: 2022-11-28" \
+//   https://api.github.com/repos/OWNER/REPO/contents/PATH
+
 /**
+ *
  * @param {string} url
- * @returns {Promise<Object>}
+ * @returns
  */
 async function customFetch(url) {
   if (typeof url !== "string") {
     throw new TypeError(`URL must be of type string: ${url}`);
   }
 
+  //   https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#headers
+  const headers = {
+    Accept: "application/vnd.github+json",
+    Authorization: `Bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "Zen-cronic",
+  };
+
   const result = await new Promise((resolve, reject) => {
-    const req = https.request(url, (res) => {
-      let result = "";
-      res.on("data", (data) => {
-        result += data;
-      });
+    const req = https.request(
+      url,
+      {
+        headers: headers,
+      },
+      (res) => {
+        let result = "";
+        res.on("data", (data) => {
+          result += data;
+        });
 
-      res.on("end", () => {
-        if (res.statusCode >= 400 && res.statusCode < 500) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
+        res.on("end", () => {
+          if (res.statusCode >= 400 && res.statusCode < 500) {
+            const error = new Error();
+            error.name = "CustomFetchError";
 
-      res.on("error", reject);
-    });
+            error.response = {
+              data: res.statusMessage,
+              headers: res.headers,
+              status: res.statusCode,
+              statusText: res.statusMessage,
+            };
+            reject(error);
+          } else {
+            // console.log({result});
+            resolve(result);
+          }
+        });
+
+        res.on("error", reject);
+      }
+    );
 
     req.on("error", (err) => {
-      console.error(err);
+      //   console.error(err);
       reject(err);
     });
 
     req.end();
   });
-
-  //parse str
-  // const resultData = JSON.parse(result["data"]);
-
-  //reassign as obj
-  // result["data"] = resultData;
 
   return result;
 }
