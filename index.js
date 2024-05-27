@@ -1,15 +1,7 @@
-// import { Octokit } from "octokit";
-// import * as https from "https";
-// import * as fs from "fs";
-// import * as path from "path";
-// import * as url from "url"
-// import { spawn } from "child_process";
-
-// const { Octokit } = require("octokit");
 const https = require("https");
 const path = require("path");
 const fs = require("fs");
-const {spawn} = require("child_process")
+const { spawn } = require("child_process");
 
 // if(typeof process.env.GITHUB_ACCESS_TOKEN === "undefined"){
 if (!process.env.GITHUB_ACCESS_TOKEN) {
@@ -18,7 +10,10 @@ if (!process.env.GITHUB_ACCESS_TOKEN) {
 // console.log(process.env.GITHUB_ACCESS_TOKEN);
 // console.log(process.env.FOO, typeof process.env.FOO === "undefined") //true
 
-module.exports = { printLib };
+const CODE_DIR_PATH = path.join(__dirname, "code");
+const WORD_DIR_PATH = path.join(__dirname, "word");
+
+module.exports = { printLib, CODE_DIR_PATH, WORD_DIR_PATH };
 
 async function printLib() {
   const owner = "gmrchk";
@@ -59,31 +54,45 @@ async function printLib() {
   //     '    return true;\n' +
   //     '};\n'
 
-  const codeDirname = path.join(__dirname, "code");
-  if (!fs.existsSync(codeDirname)) {
+  if (!fs.existsSync(CODE_DIR_PATH)) {
     // console.log("DNE");
-    fs.mkdirSync(codeDirname);
+    fs.mkdirSync(CODE_DIR_PATH);
   }
+  if (!fs.existsSync(WORD_DIR_PATH)) {
+    fs.mkdirSync(WORD_DIR_PATH);
+  }
+
   for (const o of downloadUrls) {
-    const result = await customFetch(o.download_url, true);
-    // console.log({result});
+    try {
+      const result = await customFetch(o.download_url);
 
-    fs.writeFile(
-      path.join(codeDirname, o.name),
-      // result,
-      result.data,
-      { encoding: "utf-8" },
-      (err) => {
-        if (err) throw err;
+      fs.writeFileSync(path.join(CODE_DIR_PATH, o.name), result.data, {
+        encoding: "utf-8",
+      });
+      console.log("Code Files written!");
+    } catch (err) {
+      console.error(`Error writing file ${o.name}: ${err}`);
+      process.exit(1)
+    }
+    //make sync
+    // fs.writeFile(
+    //   path.join(CODE_DIR_PATH, o.name),
+    //   // result,
+    //   result.data,
+    //   { encoding: "utf-8" },
+    //   (err) => {
+    //     if (err) throw err;
 
-        console.log("Code Files written!");
-      }
-    );
+    //     console.log("Code Files written!");
+    //   }
+    // );
   }
 
   const cProc = spawn("python", ["main.py"]);
 
-  cProc.on("error", console.error);
+  cProc.on("error", (err) => {
+    throw err;
+  });
 
   cProc.stdout.pipe(process.stdout);
   cProc.stderr.pipe(process.stderr);
@@ -105,7 +114,7 @@ async function printLib() {
  * @param {string} url
  * @returns
  */
-async function customFetch(url, isText=false) {
+async function customFetch(url) {
   if (typeof url !== "string") {
     throw new TypeError(`URL must be of type string: ${url}`);
   }
@@ -142,13 +151,10 @@ async function customFetch(url, isText=false) {
               statusText: res.statusMessage,
             };
             reject(error);
-
           } else {
-            // console.log({result});
-
             try {
               //JSON str
-              result = JSON.parse(result)
+              result = JSON.parse(result);
             } catch (error) {
               //html str or text str
             }
@@ -177,9 +183,8 @@ async function customFetch(url, isText=false) {
   });
 
   // if(!isText){
-    // result.data = JSON.parse(result.data);
+  // result.data = JSON.parse(result.data);
   // }
- 
 
-  return result
+  return result;
 }

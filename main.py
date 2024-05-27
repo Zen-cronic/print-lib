@@ -52,10 +52,10 @@ def create_docx (f_name: str, content: str) -> None:
 
 
 if not os.path.exists(write_dir_name):
-    # raise FileNotFoundError(f"Directory does not exist: {write_dir_name}")
+    raise FileNotFoundError(f"Directory does not exist: {write_dir_name}")
 
-    os.mkdir(write_dir_name)
-    print(f"Dir '{write_dir_name}' created for docx output")
+    # os.mkdir(write_dir_name)
+    # print(f"Dir '{write_dir_name}' created for docx output")
 
 
 for file_name in os.listdir(read_dir_name):
