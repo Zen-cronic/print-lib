@@ -138,6 +138,9 @@ html
 
 # dev-tests & pg
 pg
+dev
+cleanup*
+cleanup
 
 # py related
 .venv

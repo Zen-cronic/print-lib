@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+const {printLib} = require("../index");
+
+printLib(process.argv[2])
+
+// https://github.com/gmrchk/cli-testing-library/tree/master/src

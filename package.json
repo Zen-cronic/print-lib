@@ -5,17 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll ",
+    "cleanup": "node cleanup.js",
+
     "dev": "node --watch",
-    "dev:mon": "nodemon"
+    "dev:clean": "npm run cleanup && npm run dev"
 
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "esm": "^3.2.25",
-    "octokit": "^4.0.2"
-  },
+  
   "devDependencies": {
     "jest": "^29.7.0",
     "mammoth": "^1.7.2",
