@@ -1,7 +1,7 @@
 const https = require("https");
 const path = require("path");
 const fs = require("fs");
-const { spawn } = require("child_process");
+const { spawn, execFileSync } = require("child_process");
 
 // if(typeof process.env.GITHUB_ACCESS_TOKEN === "undefined"){
 if (!process.env.GITHUB_ACCESS_TOKEN) {
@@ -69,27 +69,43 @@ async function printLib() {
       fs.writeFileSync(path.join(CODE_DIR_PATH, o.name), result.data, {
         encoding: "utf-8",
       });
+
+      // await fs.promises.writeFile(path.join(CODE_DIR_PATH, o.name), result.data, {
+      //   encoding: "utf-8",
+      // });
+
       console.log("Code Files written!");
     } catch (err) {
       console.error(`Error writing file ${o.name}: ${err}`);
-      process.exit(1)
+      process.exit(1);
     }
-    
   }
 
   //ChildProcessWithoutNullStreams
-  const cProc = spawn("python", ["main.py"]);
+  // const cProc = spawn("python", ["main.py"]);
 
-  cProc.on("error", (err) => {
-    throw err;
-  });
+  // cProc.on("error", (err) => {
+  //   throw err;
+  // });
 
-  // cProc.stdout.pipe(process.stdout);
-  cProc.stderr.pipe(process.stderr);
+  // // cProc.stdout.pipe(process.stdout);
+  // cProc.stderr.pipe(process.stderr);
 
-  //or else: A worker process has failed to exit gracefully and has been force exited. 
-  //or --detectOpenHandles
-  cProc.unref()
+  // //or else: A worker process has failed to exit gracefully and has been force exited.
+  // //or --detectOpenHandles
+  // cProc.unref()
+
+  //windowsHide?
+  try {
+    //stdio default: "pipe"
+    //BUT sys.stdout.write & print() writes directly to console
+
+    execFileSync("python", ["main.py"], { encoding: "utf-8", stdio: "ignore" });
+
+   
+  } catch (error) {
+    throw error;
+  }
 }
 
 // test

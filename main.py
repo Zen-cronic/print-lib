@@ -39,8 +39,6 @@ def create_docx (f_name: str, content: str) -> None:
 
     header_run = header_paragraph.add_run()
     fldChar = qn('w:fldSimple')
-    # run._r.append(parse_xml(r'<w:fldSimple %s w:instr=" PAGE   \* MERGEFORMAT ">' % nsdecls('w')))
-    # run._r.append(parse_xml(r'<w:t>1</w:t></w:fldSimple>'))
     header_run._r.append(parse_xml(r'<w:fldSimple %s w:instr=" PAGE   \* MERGEFORMAT "><w:t>1</w:t></w:fldSimple>' % nsdecls('w')))
 
     docx_name = f_name + ".docx"
@@ -82,7 +80,6 @@ for file_name in os.listdir(read_dir_name):
         # print(content.count("\n")) # many counts
         print(f"Content printable?: {content.isprintable()}")
         # print("".isprintable()) //True
-        # w_file.write(content)
 
         print()
 
