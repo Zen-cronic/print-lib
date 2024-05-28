@@ -5,23 +5,18 @@ const cp = require("child_process");
 
 // if(typeof process.env.GITHUB_ACCESS_TOKEN === "undefined"){
 
-// console.log(process.env.GITHUB_ACCESS_TOKEN);
-// console.log(process.env.FOO, typeof process.env.FOO === "undefined") //true
-
 const CODE_DIR_PATH = path.join(__dirname, "code");
 const WORD_DIR_PATH = path.join(__dirname, "word");
 
-module.exports = { printLib, CODE_DIR_PATH, WORD_DIR_PATH };
+module.exports = { printLib, transformUrlStr, customFetch,  CODE_DIR_PATH, WORD_DIR_PATH };
 
 /**
  *
- * @param {string} url
+ * @param {string | URL} url 
  * @returns
  */
 async function customFetch(url) {
-  if (typeof url !== "string") {
-    throw new TypeError(`URL must be of type string: ${url}`);
-  }
+  
 
   if (!process.env.GITHUB_ACCESS_TOKEN) {
     throw new Error("Cannot access env vari");
@@ -104,6 +99,7 @@ async function customFetch(url) {
 async function printLib(url) {
   //for cli eth is string
   
+  url = transformUrlStr(url)
   
   const res = await customFetch(url);
   const files = res.data;
@@ -143,13 +139,6 @@ async function printLib(url) {
   //ChildProcessWithoutNullStreams
   // const cProc = spawn("python", ["main.py"]);
 
-  // cProc.on("error", (err) => {
-  //   throw err;
-  // });
-
-  // // cProc.stdout.pipe(process.stdout);
-  // cProc.stderr.pipe(process.stderr);
-
   // //or else: A worker process has failed to exit gracefully and has been force exited.
   // //or --detectOpenHandles
   // cProc.unref()
@@ -168,19 +157,36 @@ async function printLib(url) {
 }
 
 /**
- * 
- * @param {string | URL} url 
+ *
+ * @param {string | URL} url
  */
-function parseUrlStr(url){
-
-  //provided: https://github.com/gmrchk/cli-testing-library/tree/master/src
-
-  const buf = url
-  if(typeof url === "string"){
-    buf =new URL(url)
-    console.log(url);
+function transformUrlStr(url) {
+  if (typeof url !== "string" && !(url instanceof URL)) {
+    throw new TypeError(
+      `Param must be of type string or URL; Received object: ${url} of type ${typeof url}`
+    );
   }
 
+  if (typeof url === "string") {
+    url = new URL(url);
+  }
+
+  if(url.hostname !== "github.com"){
+    throw new Error(`Only support repos from github.com; Received hostname '${url.hostname}'`)
+  }
+
+  const urlPathname = url.pathname;
+
+  const parts = urlPathname.split("/").filter(Boolean);
+
+  const owner = parts[0];
+  const repoName = parts[1];
+  const repoPath = parts.slice(4).join("/");
+
+  const apiUrl = `https://api.github.com/repos/${owner}/${repoName}/contents/${repoPath}`;
+
+
+  return apiUrl
 }
 
 

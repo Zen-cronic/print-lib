@@ -12,14 +12,10 @@ describe("printLib", () => {
   const wordExtname = ".docx";
 
   beforeAll(async () => {
-    const owner = "gmrchk";
-    const repo = "cli-testing-library";
-    const repoPath = "src";
-
-    //https://api.github.com/repos/gmrchk/cli-testing-library/contents/src
-    const repoUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${repoPath}`;
-
-    await printLib(repoUrl);
+    
+    
+    const url = "https://github.com/gmrchk/cli-testing-library/tree/master/src"
+    await printLib(url);
 
     //ENOENT if invoked b4 printLib finished
     codeFilenames = fs.readdirSync(CODE_DIR_PATH, {
