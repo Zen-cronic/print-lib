@@ -139,8 +139,9 @@ html
 # dev-tests & pg
 pg
 dev
-cleanup*
+cleanup.js
 cleanup
+rate-limit.js
 
 # py related
 .venv
