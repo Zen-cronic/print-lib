@@ -8,6 +8,7 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
 #  nodemon --exec "clear && py read.py" //DNReload upon .py changes
 # nodemon --ext py --exec "clear && python main.py"
+
 read_dir_name = 'code'
 write_dir_name = "word"
 
@@ -15,8 +16,7 @@ def create_docx (f_name: str, content: str) -> None:
     
     if(content.count("\x1b") > 0):
         content = content.replace("\x1b", "\u241b")
-
-    # print(f"\nContetn read from create_docx:\n{content}")
+    
     document = Document()
 
     code_paragraph = document.add_paragraph()
@@ -27,7 +27,7 @@ def create_docx (f_name: str, content: str) -> None:
     font.name = "Aptos (Body)"
     font.size = Pt(13)
 
- # Add a footer with page numbers
+    # Add a footer with page numbers
     section = document.sections[0]
     header = section.header
 
@@ -38,7 +38,7 @@ def create_docx (f_name: str, content: str) -> None:
     header_paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
 
     header_run = header_paragraph.add_run()
-    fldChar = qn('w:fldSimple')
+    qn('w:fldSimple')
     header_run._r.append(parse_xml(r'<w:fldSimple %s w:instr=" PAGE   \* MERGEFORMAT "><w:t>1</w:t></w:fldSimple>' % nsdecls('w')))
 
     docx_name = f_name + ".docx"
@@ -49,39 +49,23 @@ def create_docx (f_name: str, content: str) -> None:
     print("Docu saved!!")
 
 
-if not os.path.exists(write_dir_name):
-    raise FileNotFoundError(f"Directory does not exist: {write_dir_name}")
+if __name__ == "__main__":
+    
+    if not os.path.exists(write_dir_name):
+        raise FileNotFoundError(f"Directory does not exist: {write_dir_name}")
 
-    # os.mkdir(write_dir_name)
-    # print(f"Dir '{write_dir_name}' created for docx output")
+    for file_name in os.listdir(read_dir_name):
+        print(f"File name: {file_name}")
 
+        r_path = os.path.join(read_dir_name, file_name)
 
-for file_name in os.listdir(read_dir_name):
-    print(f"File name: {file_name}")
+        with open(r_path, 'r', encoding='utf-8') as file:
 
-    # file path to write to
-    r_path = os.path.join(read_dir_name, file_name)
+            content = file.read()
+            
+            base_name ,_ = os.path.splitext(file_name) #tuple ('index.d', '.ts')
 
-# read + write
-
-    with (open(r_path, 'r') as file
-        #   ,  open(w_path, "w") as w_file
-          ):
-        content = file.read()
-        print(f"Is read content ascii?:{content.isascii()}")
-        # print(content)
-
-        # print(os.path.extsep)
-        # print(os.path.basename(file_name))
-        extless_f_name = file_name.split(os.path.extsep).pop(0)
-        # print(file_name) # string literal DNMutated
+            create_docx(base_name, content)
 
 
-        # print(content.count("\n")) # many counts
-        print(f"Content printable?: {content.isprintable()}")
-        # print("".isprintable()) //True
-
-        print()
-
-        create_docx(extless_f_name, content)
 

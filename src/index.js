@@ -172,7 +172,7 @@ async function printLib(url, opts) {
     throw error;
   }
 
-  return;
+  // return;
 
   //ChildProcessWithoutNullStreams
   // const cProc = spawn("python", ["main.py"]);
@@ -187,7 +187,7 @@ async function printLib(url, opts) {
 
     cp.execFileSync("python", ["main.py"], {
       encoding: "utf-8",
-      stdio: "ignore",
+      // stdio: "ignore",
     });
   } catch (error) {
     throw error;

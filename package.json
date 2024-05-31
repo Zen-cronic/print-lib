@@ -6,7 +6,7 @@
   "bin": "./bin/printLib",
   "scripts": {
     "test": "jest --watchAll ",
-    "cleanup": "node cleanup.js",
+    "clean": "node cleanup.js",
 
     "dev": "node --watch",
     "dev:clean": "npm run cleanup && npm run dev"

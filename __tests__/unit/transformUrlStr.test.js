@@ -1,4 +1,4 @@
-const { transformUrlStr } = require("../../index");
+const { transformUrlStr } = require("../../src/utils");
 
 
 describe("transformUrlStr function", () => {

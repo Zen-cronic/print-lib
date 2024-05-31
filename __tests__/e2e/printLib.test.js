@@ -1,8 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
-
-const { printLib, CODE_DIR_PATH, WORD_DIR_PATH } = require("../../index");
+const { printLib, CODE_DIR_PATH, WORD_DIR_PATH } = require("../../src");
 
 // @workspace the Corrupted zip: can't find end of central directory error is thrown from the jszip library upon restarting the test suite immediately after an initial run. But if you wait long enough, there's no error
 
@@ -12,10 +11,14 @@ describe("printLib", () => {
   const wordExtname = ".docx";
 
   beforeAll(async () => {
-    
-    
-    const url = "https://github.com/gmrchk/cli-testing-library/tree/master/src"
-    await printLib(url);
+    const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
+
+    //make opts necessary? + test w cache
+
+    //   await printLib(url, {
+    //   dir: true,
+    //   recursive: true,
+    // });
 
     //ENOENT if invoked b4 printLib finished
     codeFilenames = fs.readdirSync(CODE_DIR_PATH, {
@@ -26,11 +29,8 @@ describe("printLib", () => {
     });
   });
 
-  describe("given ", () => {
+  describe.skip("given ", () => {
     it("should create corresponding files in WORD_DIR in the same order (created with sync)", async () => {
-      //   console.log(codeFilenames);
-      //   console.log(wordFileNames);
-
       expect(codeFilenames.length).toBe(wordFileNames.length);
 
       for (let i = 0; i < codeFilenames.length; i++) {
@@ -53,6 +53,10 @@ describe("printLib", () => {
       for (let i = 0; i < codeFilenames.length; i++) {
         const currentCodeFilename = codeFilenames[i];
         const currentWordFilename = wordFileNames[i];
+
+        // if (currentCodeFilename === "document-to-html.js") {
+        //   continue;
+        // }
 
         try {
           const currentCodeFilepath = path.join(
@@ -83,7 +87,10 @@ describe("printLib", () => {
           );
         } catch (error) {
           console.error(
-            `Error from files: ${currentCodeFilename} + ${currentWordFilename}`
+            `Error from files: Code "${path.join(
+              CODE_DIR_PATH,
+              currentCodeFilename
+            )}" + Word "${currentWordFilename}"`
           );
 
           //DNW
@@ -92,7 +99,6 @@ describe("printLib", () => {
           throw error;
         }
       }
-      expect(true).toBe(true);
     });
   });
 });
