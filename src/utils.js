@@ -6,6 +6,7 @@ module.exports = {
   ensureDirExists,
   checkOpts,
   generateCodeFile,
+  hasParentDir,
 };
 
 /**
@@ -67,8 +68,9 @@ function transformUrlStr(url) {
   const repoName = parts[1];
   const repoPath = parts.slice(4).join("/");
 
-  const CONTENTS_API_URL = `https://api.github.com/repos/${owner}/${repoName}/contents/${repoPath}`;
+  //ensure nu trailing /
 
+  const CONTENTS_API_URL = `https://api.github.com/repos/${owner}/${repoName}/contents/${repoPath}`;
   return CONTENTS_API_URL;
 }
 
@@ -100,3 +102,13 @@ function generateCodeFile(dirPath, filename, content) {
     throw err;
   }
 }
+
+/**
+ *
+ * @param {string} filePath
+ */
+function hasParentDir(filePath) {
+  return path.basename(filePath) != filePath;
+}
+
+//TC: decode base64
