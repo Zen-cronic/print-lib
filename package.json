@@ -5,7 +5,7 @@
   "main": "index.js",
   "bin": "./bin/printLib",
   "scripts": {
-    "test": "jest --watch",
+    "test": "jest --watchAll",
     "clean": "node cleanup.js",
 
     "dev": "node --watch",

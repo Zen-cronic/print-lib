@@ -1,7 +1,7 @@
 const https = require("https");
 const { toNumber } = require("./utils");
 
-module.exports = { handleFetch };
+module.exports = { handleFetch, handleRateLimit };
 
 /**
  * Composed of customFetch & handleRateLimit
@@ -134,7 +134,7 @@ function handleRateLimit(headers) {
   const reset = toNumber(headers["x-ratelimit-reset"]);
   const used = toNumber(headers["x-ratelimit-used"]);
   const resource = headers["x-ratelimit-resource"];
-  const retryAfter = headers["retry-after"]; //429
+  const retryAfter = headers["retry-after"]; //429 or 403
 
   const dateOpts = {
     weekday: "short",
@@ -169,10 +169,12 @@ function handleRateLimit(headers) {
 
   const warningThreshold = [10, 25, 50, 75, 90, 100];
 
-  const maxThreshold = warningThreshold[warningThreshold.length - 1];
+  const warningThresholdLen = warningThreshold.length;
+
+  const maxThreshold = warningThreshold[warningThresholdLen - 1];
 
   //skip (100)
-  for (let i = 0; i < maxThreshold; i++) {
+  for (let i = 0; i < warningThresholdLen - 1; i++) {
     const curr = warningThreshold[i];
     const next = warningThreshold[i + 1];
 
@@ -182,7 +184,8 @@ function handleRateLimit(headers) {
       );
     }
     if (usedPercentage >= curr && usedPercentage < next) {
-      console.error(`You've made ${usedPercentage}% of endpoint requests`);
+      console.warn(`You've made ${usedPercentage}% of endpoint requests`);
+      break;
     }
   }
 

@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
 const { printLib, CODE_DIR_PATH, WORD_DIR_PATH } = require("../../src");
-const cleanup = require("../../cleanup");
+const cleanup = require("../../misc/cleanup");
 
 describe("printLib", () => {
   let codeFilenames;
@@ -10,11 +10,11 @@ describe("printLib", () => {
   const wordExtname = ".docx";
 
   beforeAll(async () => {
-
     // cleanup()
+  
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
-      await printLib(url, {
+    await printLib(url, {
       dir: true,
       recursive: true,
     });
@@ -46,16 +46,11 @@ describe("printLib", () => {
 
   describe("given another", () => {
     it("should match corresponding file content", async () => {
-      // console.log(codeFilenames);
-      // console.log(wordFileNames);
 
+      
       for (let i = 0; i < codeFilenames.length; i++) {
         const currentCodeFilename = codeFilenames[i];
         const currentWordFilename = wordFileNames[i];
-
-        // if (currentCodeFilename === "document-to-html.js") {
-        //   continue;
-        // }
 
         try {
           const currentCodeFilepath = path.join(
