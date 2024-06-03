@@ -7,6 +7,7 @@ module.exports = {
   checkOpts,
   generateCodeFile,
   hasParentDir,
+  toNumber,
 };
 
 /**
@@ -42,6 +43,7 @@ function checkOpts(opts) {
 /**
  *
  * @param {string | URL} url
+ * @returns {string}
  */
 function transformUrlStr(url) {
   if (typeof url !== "string" && !(url instanceof URL)) {
@@ -89,13 +91,19 @@ function ensureDirExists(dirPath) {
   }
 }
 
+/**
+ *
+ * @param {string} dirPath
+ * @param {string} filename
+ * @param {string} content
+ */
 function generateCodeFile(dirPath, filename, content) {
   try {
     fs.writeFileSync(path.join(dirPath, filename), content, {
       encoding: "utf-8",
     });
 
-    console.log("Code Files written!");
+    // console.log("Code Files written!");
   } catch (err) {
     console.error(`Error writing file ${o.name}: ${err}`);
     // process.exit(1);
@@ -106,9 +114,19 @@ function generateCodeFile(dirPath, filename, content) {
 /**
  *
  * @param {string} filePath
+ * @returns {boolean}
  */
 function hasParentDir(filePath) {
   return path.basename(filePath) != filePath;
+}
+
+/**
+ * Convert numerical string into number type
+ * @param {string} str
+ * @returns {number}
+ */
+function toNumber(str) {
+  return +str;
 }
 
 //TC: decode base64

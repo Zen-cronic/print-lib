@@ -1,8 +1,7 @@
 const path = require("path");
-const fs = require("fs");
 const cp = require("child_process");
 
-const { customFetch } = require("./customFetch");
+const { handleFetch } = require("./request");
 const {
   transformUrlStr,
   ensureDirExists,
@@ -55,7 +54,7 @@ async function printLib(url, opts) {
     ensureDirExists(CODE_DIR_PATH);
 
     if (opts.singleFile) {
-      const res = await customFetch(url);
+      const res = await handleFetch(url);
       const { content, encoding, name } = res.data;
 
       //base64
@@ -65,7 +64,7 @@ async function printLib(url, opts) {
 
       generateCodeFile(CODE_DIR_PATH, name, decodedContent);
     } else if (opts.dir && !opts.recursive) {
-      const res = await customFetch(url);
+      const res = await handleFetch(url);
 
       const files = res.data.filter(
         (f) => f.size != 0 && f.type == "file" && f.download_url
@@ -73,27 +72,22 @@ async function printLib(url, opts) {
 
       //files.foreach - does NOT wait
       for (const f of files) {
-        const textContent = await customFetch(f.download_url);
+        const textContent = await handleFetch(f.download_url);
         generateCodeFile(CODE_DIR_PATH, f.name, textContent);
       }
 
       //recursive
     } else if (opts.dir && opts.recursive) {
-      let fileCount = 0;
-      // console.log({ url }); //in full
-
       const lastSlashIdx = url.lastIndexOf("/");
-      //contents api for parent dir
+
       const lastSegment = url.slice(lastSlashIdx + 1);
-      // console.log({lastSegment});
 
+      //contents api for parent dir
       const parentDirUrl = url.slice(0, lastSlashIdx);
-      // console.log(parentDirUrl);
 
-      const res = await customFetch(parentDirUrl);
+      const res = await handleFetch(parentDirUrl);
 
       const parentFiles = res.data;
-      // console.log(files);
 
       const contextDir = parentFiles.find(
         (f) =>
@@ -104,23 +98,14 @@ async function printLib(url, opts) {
           !f.download_url
       );
 
-      // console.log(contextDir);
-
       //tree api url
       const contextDirTreeUrl = contextDir.git_url;
 
-      // const newUrl = new URL(contextDirUrl)
-
-      // const recursiveSearchParam = new URLSearchParams("recursive=true")
-      // console.log({recursiveSearchParam});
-
       const recursiveDirTreeUrl = contextDirTreeUrl.concat("?recursive=true");
-      // console.log(recursiveDirTreeUrl )
 
-      const contextRes = await customFetch(recursiveDirTreeUrl);
+      const contextRes = await handleFetch(recursiveDirTreeUrl);
 
       const contextFiles = contextRes.data.tree;
-      // console.log(contextFiles);
 
       const fileNamesUniq = [];
 
@@ -131,17 +116,12 @@ async function printLib(url, opts) {
           f.mode === "100644" &&
           typeof f.size === "number"
         ) {
-          fileCount++;
-          // console.log(f);
-          const fileRes = await customFetch(f.url);
+          const fileRes = await handleFetch(f.url);
 
           const { content, encoding } = fileRes.data;
 
-          // console.log(fileRes.data);
-
           const filePath = f.path;
           let fileName = path.basename(filePath);
-          console.log({ fileName });
 
           if (!fileNamesUniq.includes(fileName) && !hasParentDir(filePath)) {
             fileNamesUniq.push(fileName);
@@ -165,8 +145,6 @@ async function printLib(url, opts) {
           generateCodeFile(CODE_DIR_PATH, fileName, decodedContent);
         }
       }
-
-      console.log({ fileCount });
     }
   } catch (error) {
     throw error;

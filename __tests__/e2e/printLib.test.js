@@ -2,8 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
 const { printLib, CODE_DIR_PATH, WORD_DIR_PATH } = require("../../src");
-
-// @workspace the Corrupted zip: can't find end of central directory error is thrown from the jszip library upon restarting the test suite immediately after an initial run. But if you wait long enough, there's no error
+const cleanup = require("../../cleanup");
 
 describe("printLib", () => {
   let codeFilenames;
@@ -11,14 +10,14 @@ describe("printLib", () => {
   const wordExtname = ".docx";
 
   beforeAll(async () => {
+
+    // cleanup()
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
-    //make opts necessary? + test w cache
-
-    //   await printLib(url, {
-    //   dir: true,
-    //   recursive: true,
-    // });
+      await printLib(url, {
+      dir: true,
+      recursive: true,
+    });
 
     //ENOENT if invoked b4 printLib finished
     codeFilenames = fs.readdirSync(CODE_DIR_PATH, {
@@ -27,9 +26,9 @@ describe("printLib", () => {
     wordFileNames = fs.readdirSync(WORD_DIR_PATH, {
       encoding: "utf-8",
     });
-  });
+  }, 15000);
 
-  describe.skip("given ", () => {
+  describe("given ", () => {
     it("should create corresponding files in WORD_DIR in the same order (created with sync)", async () => {
       expect(codeFilenames.length).toBe(wordFileNames.length);
 
