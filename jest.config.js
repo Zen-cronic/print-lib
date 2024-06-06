@@ -6,6 +6,7 @@ const config = {
     "<rootDir>/code/",
     "<rootDir>/dev/",
     "<rootDir>/pg/",
+    "<rootDir>/pdf/",
   ],
 };
 

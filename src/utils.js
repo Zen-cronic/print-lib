@@ -10,6 +10,8 @@ module.exports = {
   toNumber,
   isArray,
   formatDate,
+  replaceWhitespace,
+  cleanup,
 };
 
 /**
@@ -79,14 +81,16 @@ function transformUrlStr(url) {
 }
 
 /**
- *  Create dir if it does NOT exist; Exit with 1 if error
- * @param {string} dirPath
+ *  Create dirs if it does NOT exist; Exit with 1 if error
+ * @param {...string} dirPaths
  */
-function ensureDirExists(dirPath) {
+function ensureDirExists(...dirPaths) {
   try {
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath);
-    }
+    dirPaths.forEach((path) => {
+      if (!fs.existsSync(path)) {
+        fs.mkdirSync(path);
+      }
+    });
   } catch (error) {
     console.error(error);
     process.exit(1);
@@ -107,7 +111,7 @@ function generateCodeFile(dirPath, filename, content) {
 
     // console.log("Code Files written!");
   } catch (err) {
-    console.error(`Error writing file ${o.name}: ${err}`);
+    console.error(`Error writing file ${filename}: ${err}`);
     throw err;
   }
 }
@@ -167,6 +171,26 @@ function formatDate(date) {
   const formattedDate = date.toLocaleDateString("en-US", dateOpts);
 
   return formattedDate;
+}
+
+/**
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+function replaceWhitespace(str) {
+  return str.replace(/\s+/g, "");
+}
+
+/**
+ *
+ * @param  {...string} absPaths
+ */
+function cleanup(...absPaths) {
+  
+  absPaths.forEach((path) => {
+    fs.rmSync(path, { recursive: true, force: true });
+  });
 }
 
 //TC: decode base64

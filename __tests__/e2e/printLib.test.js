@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
 const { printLib, CODE_DIR_PATH, WORD_DIR_PATH } = require("../../src");
-const cleanup = require("../../misc/cleanup");
+const { replaceWhitespace } = require("../../src/utils");
 
 describe("printLib", () => {
   let codeFilenames;
@@ -10,8 +10,7 @@ describe("printLib", () => {
   const wordExtname = ".docx";
 
   beforeAll(async () => {
-    // cleanup()
-  
+
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
     await printLib(url, {
@@ -33,7 +32,7 @@ describe("printLib", () => {
       expect(codeFilenames.length).toBe(wordFileNames.length);
 
       for (let i = 0; i < codeFilenames.length; i++) {
-        //remove extname for each file in both arr
+
         const codeExtname = path.extname(codeFilenames[i]);
 
         const currentCodeFilename = codeFilenames[i].replace(codeExtname, "");
@@ -46,8 +45,6 @@ describe("printLib", () => {
 
   describe("given another", () => {
     it("should match corresponding file content", async () => {
-
-      
       for (let i = 0; i < codeFilenames.length; i++) {
         const currentCodeFilename = codeFilenames[i];
         const currentWordFilename = wordFileNames[i];
@@ -73,12 +70,23 @@ describe("printLib", () => {
             path: currentWordFilepath,
           });
 
-          //X=*�'�I¶a<�|...
-          // const wordContent = fs.readFileSync(currentWordFilepath, {encoding: "utf-8"});
+          const cleanedWordContent = replaceWhitespace(wordContent.value)
+          const cleanedCodeContent = replaceWhitespace(codeContent)
 
-          expect(wordContent.value.replace(/\s/g, "")).toBe(
-            codeContent.replace(/\s/g, "")
+          const titleRegex = new RegExp(
+            "^\\/\\/" + currentCodeFilename + "(.*)"
           );
+
+          expect(cleanedWordContent).toMatch(titleRegex);
+
+          const matched = cleanedWordContent.match(titleRegex);
+          const textAfterTitle = matched[1];
+          
+          if (matched && textAfterTitle) {
+            expect(textAfterTitle).toBe(cleanedCodeContent);
+          } else {
+            throw new Error("Title NOT found or NO text after title.");
+          }
         } catch (error) {
           console.error(
             `Error from files: Code "${path.join(

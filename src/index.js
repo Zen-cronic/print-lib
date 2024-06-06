@@ -9,15 +9,18 @@ const {
   generateCodeFile,
   hasParentDir,
   isArray,
+  cleanup,
 } = require("./utils");
 
 const CODE_DIR_PATH = path.resolve("code");
 const WORD_DIR_PATH = path.resolve("word");
+const PDF_DIR_PATH = path.resolve("pdf");
 
 module.exports = {
   printLib,
   CODE_DIR_PATH,
   WORD_DIR_PATH,
+  PDF_DIR_PATH,
 };
 
 /**
@@ -49,10 +52,11 @@ async function printLib(url, opts) {
   try {
     opts = checkOpts(opts);
 
+    cleanup(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
+
     url = transformUrlStr(url);
 
-    ensureDirExists(WORD_DIR_PATH);
-    ensureDirExists(CODE_DIR_PATH);
+    ensureDirExists(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
 
     if (opts.singleFile) {
       const res = await handleFetch(url);
@@ -78,8 +82,8 @@ async function printLib(url, opts) {
 
       //files.foreach - does NOT wait
       for (const f of files) {
-        const textContent = await handleFetch(f.download_url);
-        generateCodeFile(CODE_DIR_PATH, f.name, textContent);
+        const res = await handleFetch(f.download_url);
+        generateCodeFile(CODE_DIR_PATH, f.name, res.data);
       }
 
       //recursive
