@@ -8,6 +8,8 @@ module.exports = {
   generateCodeFile,
   hasParentDir,
   toNumber,
+  isArray,
+  formatDate,
 };
 
 /**
@@ -106,7 +108,6 @@ function generateCodeFile(dirPath, filename, content) {
     // console.log("Code Files written!");
   } catch (err) {
     console.error(`Error writing file ${o.name}: ${err}`);
-    // process.exit(1);
     throw err;
   }
 }
@@ -127,6 +128,45 @@ function hasParentDir(filePath) {
  */
 function toNumber(str) {
   return +str;
+}
+
+/**
+ *
+ * @param {Array} arr
+ * @returns {boolean}
+ */
+function isArray(arr) {
+  return Array.isArray(arr);
+}
+
+/**
+ *
+ * @param {Date} date
+ * @returns {string}
+ */
+function formatDate(date) {
+  const toStr = Object.prototype.toString;
+
+  if (!(date instanceof Date) || toStr.call(date) !== "[object Date]") {
+    throw new Error(
+      `Expected Date object; Received "${date}" of type ${typeof date} | ${toStr.call(
+        date
+      )}`
+    );
+  }
+  const dateOpts = {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  };
+
+  const formattedDate = date.toLocaleDateString("en-US", dateOpts);
+
+  return formattedDate;
 }
 
 //TC: decode base64

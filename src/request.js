@@ -1,5 +1,5 @@
 const https = require("https");
-const { toNumber } = require("./utils");
+const { toNumber, formatDate } = require("./utils");
 
 module.exports = { handleFetch, handleRateLimit };
 
@@ -136,34 +136,18 @@ function handleRateLimit(headers) {
   const resource = headers["x-ratelimit-resource"];
   const retryAfter = headers["retry-after"]; //429 or 403
 
-  const dateOpts = {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-  };
-
   if (retryAfter) {
     const sec = toNumber(retryAfter);
     const ms = sec * 1000;
 
-    const retryAfterDateTime = new Date(Date.now() + ms).toLocaleString(
-      "en-US",
-      dateOpts
-    );
+    const retryAfterDateTime = formatDate(new Date(Date.now() + ms));
 
     throw new Error(
-      `Please retry your request after ${retryAfterDateTime} (${sec} seconds from now) `
+      `Please retry your request after ${retryAfterDateTime} (${sec} seconds from now)`
     );
   }
 
-  const resetDateTime = new Date(reset * 1000).toLocaleString(
-    "en-US",
-    dateOpts
-  );
+  const resetDateTime = formatDate(new Date(reset * 1000))
 
   const usedPercentage = Math.ceil((used / limit) * 100);
 

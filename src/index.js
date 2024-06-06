@@ -8,6 +8,7 @@ const {
   checkOpts,
   generateCodeFile,
   hasParentDir,
+  isArray,
 } = require("./utils");
 
 const CODE_DIR_PATH = path.resolve("code");
@@ -66,6 +67,11 @@ async function printLib(url, opts) {
     } else if (opts.dir && !opts.recursive) {
       const res = await handleFetch(url);
 
+      if (!isArray(res.data)) {
+        throw new Error(
+          `Must be an array; Received ${res.data} of type ${typeof res.data}`
+        );
+      }
       const files = res.data.filter(
         (f) => f.size != 0 && f.type == "file" && f.download_url
       );
@@ -89,6 +95,11 @@ async function printLib(url, opts) {
 
       const parentFiles = res.data;
 
+      if (!isArray(parentFiles)) {
+        throw new Error(
+          `Must be an array; Received ${res.data} of type ${typeof res.data}`
+        );
+      }
       const contextDir = parentFiles.find(
         (f) =>
           f.name == lastSegment &&
@@ -107,6 +118,11 @@ async function printLib(url, opts) {
 
       const contextFiles = contextRes.data.tree;
 
+      if (!isArray(contextFiles)) {
+        throw new Error(
+          `Must be an array; Received ${res.data} of type ${typeof res.data}`
+        );
+      }
       const fileNamesUniq = [];
 
       for (f of contextFiles) {
@@ -127,7 +143,6 @@ async function printLib(url, opts) {
             fileNamesUniq.push(fileName);
           } else {
             // dir/file.js -> DIR-file.js
-
             fileName = filePath
               .split("/")
               .map((seg, idx, arr) => {
@@ -146,22 +161,6 @@ async function printLib(url, opts) {
         }
       }
     }
-  } catch (error) {
-    throw error;
-  }
-
-  // return;
-
-  //ChildProcessWithoutNullStreams
-  // const cProc = spawn("python", ["main.py"]);
-
-  // //or else: A worker process has failed to exit gracefully and has been force exited.
-  // //or --detectOpenHandles
-  // cProc.unref()
-
-  try {
-    //stdio default: "pipe"
-    //BUT sys.stdout.write & print() writes directly to console
 
     cp.execFileSync("python", ["main.py"], {
       encoding: "utf-8",
@@ -170,4 +169,8 @@ async function printLib(url, opts) {
   } catch (error) {
     throw error;
   }
+
+  // //or else: A worker process has failed to exit gracefully and has been force exited.
+  // //or --detectOpenHandles
+  // cProc.unref()
 }
