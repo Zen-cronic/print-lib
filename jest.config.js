@@ -1,13 +1,7 @@
 /** @type {import('jest').Config} */
+
 const config = {
-  watchPathIgnorePatterns: [
-    "<rootDir>/misc/",
-    "<rootDir>/word/",
-    "<rootDir>/code/",
-    "<rootDir>/dev/",
-    "<rootDir>/pg/",
-    "<rootDir>/pdf/",
-  ],
+  watchPathIgnorePatterns: ["<rootDir>/(misc|word|code|dev|pg|pdf)/"],
 };
 
 module.exports = config;

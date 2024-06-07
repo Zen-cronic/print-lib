@@ -7,18 +7,15 @@
   "scripts": {
     "test": "jest --watchAll",
     "clean": "node cleanup.js",
-
     "dev": "node --watch",
     "dev:clean": "npm run cleanup && npm run dev"
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  
   "devDependencies": {
     "jest": "^29.7.0",
     "mammoth": "^1.7.2",
-    "nodemon": "^3.1.1"
+    "pdfreader": "^3.0.2"
   }
 }
