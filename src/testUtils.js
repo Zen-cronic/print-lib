@@ -1,13 +1,3 @@
-// require = require("esm")(module );
-// const { PdfReader } = require("pdfreader");
-
-// rest of your code...
-// const { PdfReader } = await import("pdfreader");
-
-import  { PdfReader } from "pdfreader"
-
-
-
 module.exports = {
   parsePdf,
   composeTextFromPdf,
@@ -24,7 +14,7 @@ module.exports = {
  * @returns {Promise<{yCoordinates: Array<number>, texts: Array<TextItem>}>}
  */
 async function parsePdf(filePath) {
-//   const { PdfReader } = await import("pdfreader");
+  const { PdfReader } = await import("pdfreader");
 
   return new Promise((resolve, reject) => {
     const yCoordinates = [];

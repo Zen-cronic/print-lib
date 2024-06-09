@@ -1,26 +1,27 @@
-import path from "path";
-import fs from "fs";
-import mammoth from "mammoth";
-import {
-  printLib,
-  CODE_DIR_PATH,
-  WORD_DIR_PATH,
-  PDF_DIR_PATH,
-} from "../../src/index.js";
-
-import { replaceWhitespace } from "../../src/utils.js";
-import { parsePdf, composeTextFromPdf } from "../../src/testUtils.js";
-// const path = require("path");
-// const fs = require("fs");
-// const mammoth = require("mammoth");
-// const {
+// import path from "path";
+// import fs from "fs";
+// import mammoth from "mammoth";
+// import {
 //   printLib,
 //   CODE_DIR_PATH,
 //   WORD_DIR_PATH,
 //   PDF_DIR_PATH,
-// } = require("../../src");
-// const { replaceWhitespace } = require("../../src/utils");
-// const { parsePdf, composeTextFromPdf } = require("../../src/testUtils");
+// } from "../../src/index.js";
+
+// import { replaceWhitespace } from "../../src/utils.js";
+// import { parsePdf, composeTextFromPdf } from "../../src/testUtils.js";
+
+const path = require("path");
+const fs = require("fs");
+const mammoth = require("mammoth");
+const {
+  printLib,
+  CODE_DIR_PATH,
+  WORD_DIR_PATH,
+  PDF_DIR_PATH,
+} = require("../../src");
+const { replaceWhitespace } = require("../../src/utils");
+const { parsePdf, composeTextFromPdf } = require("../../src/testUtils");
 
 describe("printLib", () => {
   let codeFilenames;
@@ -30,22 +31,29 @@ describe("printLib", () => {
   beforeAll(async () => {
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
-    // await printLib(url, {
-    //   dir: true,
-    //   recursive: true,
-    // });
+    try {
+      await printLib(url, {
+        dir: true,
+        recursive: true,
+      });
 
-    //ENOENT if invoked b4 printLib finished
-    codeFilenames = fs.readdirSync(CODE_DIR_PATH, {
-      encoding: "utf-8",
-    });
-    wordFileNames = fs.readdirSync(WORD_DIR_PATH, {
-      encoding: "utf-8",
-    });
-    pdfFileNames = fs.readdirSync(PDF_DIR_PATH, {
-      encoding: "utf-8",
-    });
-  }, 20000);
+      //ENOENT if invoked b4 printLib finished
+      codeFilenames = fs.promises.readdir(CODE_DIR_PATH, {
+        encoding: "utf-8",
+      });
+      wordFileNames = fs.promises.readdir(WORD_DIR_PATH, {
+        encoding: "utf-8",
+      });
+      pdfFileNames = fs.promises.readdir(PDF_DIR_PATH, {
+        encoding: "utf-8",
+      });
+
+      await Promise.all([codeFilenames, wordFileNames, pdfFileNames]);
+    } catch (error) {
+      console.error(`Error reading dir in setup`);
+      throw error;
+    }
+  }, 30000);
 
   describe("given ", () => {
     it("should create corresponding files in WORD_DIR in the same order (created with sync)", async () => {

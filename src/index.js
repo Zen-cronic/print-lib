@@ -11,6 +11,7 @@ const {
   isArray,
   cleanup,
 } = require("./utils");
+const { performance } = require("perf_hooks");
 
 const CODE_DIR_PATH = path.resolve("code");
 const WORD_DIR_PATH = path.resolve("word");
@@ -52,7 +53,7 @@ async function printLib(url, opts) {
   try {
     opts = checkOpts(opts);
 
-    cleanup(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
+    await cleanup(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
 
     url = transformUrlStr(url);
 
@@ -129,6 +130,9 @@ async function printLib(url, opts) {
       }
       const fileNamesUniq = [];
 
+      const codeFilesPromises = [];
+
+      const start = performance.now()
       for (f of contextFiles) {
         //nu f.size for {type: "tree", mode: "040000"}
         if (
@@ -161,20 +165,23 @@ async function printLib(url, opts) {
 
           const encodedBuf = Buffer.from(content, encoding);
           const decodedContent = encodedBuf.toString("utf-8");
-          generateCodeFile(CODE_DIR_PATH, fileName, decodedContent);
+          codeFilesPromises.push(
+            generateCodeFile(CODE_DIR_PATH, fileName, decodedContent)
+          );
         }
       }
+      const end = performance.now()
+      const diff = end - start;
+
+      console.log(`Time taken: ${diff / 1000} sec`);
+      await Promise.all(codeFilesPromises);
     }
 
+    //python || python3
     cp.execFileSync("python", ["main.py"], {
       encoding: "utf-8",
-      // stdio: "ignore",
     });
   } catch (error) {
     throw error;
   }
-
-  // //or else: A worker process has failed to exit gracefully and has been force exited.
-  // //or --detectOpenHandles
-  // cProc.unref()
 }

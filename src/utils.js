@@ -103,13 +103,15 @@ function ensureDirExists(...dirPaths) {
  * @param {string} filename
  * @param {string} content
  */
-function generateCodeFile(dirPath, filename, content) {
+async function generateCodeFile(dirPath, filename, content) {
   try {
-    fs.writeFileSync(path.join(dirPath, filename), content, {
+    // fs.writeFileSync(path.join(dirPath, filename), content, {
+    //   encoding: "utf-8",
+    // });
+    await fs.promises.writeFile(path.join(dirPath, filename), content, {
       encoding: "utf-8",
     });
 
-    // console.log("Code Files written!");
   } catch (err) {
     console.error(`Error writing file ${filename}: ${err}`);
     throw err;
@@ -186,11 +188,14 @@ function replaceWhitespace(str) {
  *
  * @param  {...string} absPaths
  */
-function cleanup(...absPaths) {
-  
-  absPaths.forEach((path) => {
-    fs.rmSync(path, { recursive: true, force: true });
-  });
+async function cleanup(...absPaths) {
+  const promises = [];
+  for (const path of absPaths) {
+    promises.push(fs.promises.rm(path, { recursive: true, force: true }));
+
+  }
+  await Promise.all(promises)
+ 
 }
 
 //TC: decode base64

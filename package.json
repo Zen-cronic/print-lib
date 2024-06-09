@@ -6,6 +6,8 @@
   "bin": "./bin/printLib",
   "scripts": {
     "test": "jest --watchAll",
+    "test:dynamic": "set NODE_OPTIONS=--experimental-vm-modules && jest --watchAll",
+    "test:ci": "export NODE_OPTIONS='--experimental-vm-modules' && jest --ci",
     "clean": "node cleanup.js",
     "dev": "node --watch",
     "dev:clean": "npm run cleanup && npm run dev"
