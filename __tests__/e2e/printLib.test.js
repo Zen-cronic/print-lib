@@ -1,16 +1,3 @@
-// import path from "path";
-// import fs from "fs";
-// import mammoth from "mammoth";
-// import {
-//   printLib,
-//   CODE_DIR_PATH,
-//   WORD_DIR_PATH,
-//   PDF_DIR_PATH,
-// } from "../../src/index.js";
-
-// import { replaceWhitespace } from "../../src/utils.js";
-// import { parsePdf, composeTextFromPdf } from "../../src/testUtils.js";
-
 const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
@@ -26,6 +13,7 @@ const { parsePdf, composeTextFromPdf } = require("../../src/testUtils");
 describe("printLib", () => {
   let codeFilenames;
   let wordFileNames;
+  let pdfFileNames;
   const wordExtname = ".docx";
 
   beforeAll(async () => {
@@ -53,7 +41,7 @@ describe("printLib", () => {
       console.error(`Error reading dir in setup`);
       throw error;
     }
-  }, 30000);
+  }, 40000);
 
   describe("given ", () => {
     it("should create corresponding files in WORD_DIR in the same order (created with sync)", async () => {

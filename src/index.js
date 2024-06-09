@@ -1,5 +1,7 @@
 const path = require("path");
 const cp = require("child_process");
+const util = require("util");
+const { performance } = require("perf_hooks");
 
 const { handleFetch } = require("./request");
 const {
@@ -11,7 +13,6 @@ const {
   isArray,
   cleanup,
 } = require("./utils");
-const { performance } = require("perf_hooks");
 
 const CODE_DIR_PATH = path.resolve("code");
 const WORD_DIR_PATH = path.resolve("word");
@@ -132,7 +133,7 @@ async function printLib(url, opts) {
 
       const codeFilesPromises = [];
 
-      const start = performance.now()
+      const start = performance.now();
       for (f of contextFiles) {
         //nu f.size for {type: "tree", mode: "040000"}
         if (
@@ -170,17 +171,32 @@ async function printLib(url, opts) {
           );
         }
       }
-      const end = performance.now()
+      const end = performance.now();
       const diff = end - start;
 
       console.log(`Time taken: ${diff / 1000} sec`);
+
+      const startGenCode = performance.now();
       await Promise.all(codeFilesPromises);
+      const endGenCode = performance.now();
+
+      const diffCodeGen = endGenCode - startGenCode;
+
+      console.log(`Time taken Gen Code: ${diffCodeGen / 1000} sec`);
     }
 
     //python || python3
-    cp.execFileSync("python", ["main.py"], {
+
+    const asyncExecFile = util.promisify(cp.execFile);
+
+    const startPy = performance.now();
+    await asyncExecFile("python", ["main.py"], {
       encoding: "utf-8",
     });
+    const endPy = performance.now();
+    const diffPy = endPy - startPy;
+
+    console.log(`Time taken Py: ${diffPy / 1000} sec`);
   } catch (error) {
     throw error;
   }
