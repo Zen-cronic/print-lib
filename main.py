@@ -79,7 +79,7 @@ if __name__ == "__main__":
             
             create_docx(file_name, content)
 
-    convert(word_dir_name + "/", pdf_dir_name + "/")  
+    # convert(word_dir_name + "/", pdf_dir_name + "/")  
 
 
 

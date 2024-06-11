@@ -1,6 +1,7 @@
 const path = require("path");
 const cp = require("child_process");
 const util = require("util");
+const { platform } = require("process");
 const { performance } = require("perf_hooks");
 
 const { handleFetch } = require("./request");
@@ -131,7 +132,7 @@ async function printLib(url, opts) {
       }
       const fileNamesUniq = [];
 
-      const codeFilesPromises = [];
+      const genCodeFilesPromises = [];
 
       const start = performance.now();
       for (f of contextFiles) {
@@ -166,7 +167,7 @@ async function printLib(url, opts) {
 
           const encodedBuf = Buffer.from(content, encoding);
           const decodedContent = encodedBuf.toString("utf-8");
-          codeFilesPromises.push(
+          genCodeFilesPromises.push(
             generateCodeFile(CODE_DIR_PATH, fileName, decodedContent)
           );
         }
@@ -174,10 +175,10 @@ async function printLib(url, opts) {
       const end = performance.now();
       const diff = end - start;
 
-      console.log(`Time taken: ${diff / 1000} sec`);
+      console.log(`Time taken 2+n requests: ${diff / 1000} sec`);
 
       const startGenCode = performance.now();
-      await Promise.all(codeFilesPromises);
+      await Promise.all(genCodeFilesPromises);
       const endGenCode = performance.now();
 
       const diffCodeGen = endGenCode - startGenCode;
@@ -190,7 +191,10 @@ async function printLib(url, opts) {
     const asyncExecFile = util.promisify(cp.execFile);
 
     const startPy = performance.now();
-    await asyncExecFile("python", ["main.py"], {
+
+    const pythonCmd = platform == "win32" ? "python" : "python3";
+
+    await asyncExecFile(pythonCmd, ["main.py"], {
       encoding: "utf-8",
     });
     const endPy = performance.now();
