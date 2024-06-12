@@ -37,10 +37,6 @@ def create_docx (f_name: str, content: str) -> None:
     code_run = code_paragraph.add_run(content)
     formatFont(code_run)
 
-    font = code_run.font 
-    font.name = "Aptos (Body)"
-    font.size = Pt(13)
-
     # Add #pg in header
     section = document.sections[0]
     header = section.header
@@ -79,7 +75,7 @@ if __name__ == "__main__":
             
             create_docx(file_name, content)
 
-    # convert(word_dir_name + "/", pdf_dir_name + "/")  
+    convert(word_dir_name + "/", pdf_dir_name + "/")  
 
 
 

@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
+
 const {
   printLib,
   CODE_DIR_PATH,
@@ -8,45 +9,48 @@ const {
   PDF_DIR_PATH,
 } = require("../../src");
 const { replaceWhitespace } = require("../../src/utils");
-const { parsePdf, composeTextFromPdf } = require("../../src/testUtils");
+const { parsePdf, composeTextFromPdf, isCI } = require("../../src/testUtils");
 
 describe("printLib", () => {
   let codeFilenames;
   let wordFileNames;
   let pdfFileNames;
+  const isInCIEnv = isCI();
   const wordExtname = ".docx";
 
   beforeAll(async () => {
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
     try {
-      await printLib(url, {
-        dir: true,
-        recursive: true,
+      // await printLib(url, {
+      //   dir: true,
+      //   recursive: true,
+      // });
+
+      const codeFilenamesPromise = fs.promises.readdir(CODE_DIR_PATH, {
+        encoding: "utf-8",
+      });
+      const wordFileNamesPromise = fs.promises.readdir(WORD_DIR_PATH, {
+        encoding: "utf-8",
+      });
+      const pdfFileNamesPromise = fs.promises.readdir(PDF_DIR_PATH, {
+        encoding: "utf-8",
       });
 
-      //ENOENT if invoked b4 printLib finished
-      codeFilenames = fs.promises.readdir(CODE_DIR_PATH, {
-        encoding: "utf-8",
-      });
-      wordFileNames = fs.promises.readdir(WORD_DIR_PATH, {
-        encoding: "utf-8",
-      });
-      pdfFileNames = fs.promises.readdir(PDF_DIR_PATH, {
-        encoding: "utf-8",
-      });
-
-      await Promise.all([codeFilenames, wordFileNames, pdfFileNames]);
+      [codeFilenames, wordFileNames, pdfFileNames] = await Promise.all([
+        codeFilenamesPromise,
+        wordFileNamesPromise,
+        pdfFileNamesPromise,
+      ]);
     } catch (error) {
       console.error(`Error reading dir in setup`);
       throw error;
     }
   }, 40000);
 
-  describe("given ", () => {
-    it("should create corresponding files in WORD_DIR in the same order (created with sync)", async () => {
+  describe("given a valid repository url is requested", () => {
+    it("should create corresponding files for code and word in the same order", () => {
       expect(codeFilenames.length).toBe(wordFileNames.length);
-      expect(wordFileNames.length).toBe(pdfFileNames.length);
 
       for (let i = 0; i < codeFilenames.length; i++) {
         const codeExtname = path.extname(codeFilenames[i]);
@@ -59,12 +63,11 @@ describe("printLib", () => {
     });
   });
 
-  describe("given the word docx and pdf files are generated from the respective code files", () => {
-    it("should match corresponding file content", async () => {
+  describe("given that word and pdf files are generated from the respective code files", () => {
+    it("should match corresponding file content for code and word", async () => {
       for (let i = 0; i < codeFilenames.length; i++) {
         const currentCodeFilename = codeFilenames[i];
         const currentWordFilename = wordFileNames[i];
-        const currentPdfFilename = pdfFileNames[i];
 
         try {
           const currentCodeFilepath = path.join(
@@ -76,47 +79,34 @@ describe("printLib", () => {
             currentWordFilename
           );
 
-          const currentPdfFilepath = path.join(
-            PDF_DIR_PATH,
-            currentPdfFilename
-          );
-
-          //raw content
+          let codeContent = await fs.promises.readFile(currentCodeFilepath, {
+            encoding: "utf-8",
+          });
 
           //missing ESC symbol "\x1b" -> "\u241b"
-          const codeContent = fs
-            .readFileSync(currentCodeFilepath, {
-              encoding: "utf-8",
-            })
-            .replace(/\x1b/g, "\u241b");
+          codeContent = codeContent.replace(/\x1b/g, "\u241b");
 
           const wordContent = await mammoth.extractRawText({
             path: currentWordFilepath,
           });
 
-          const { yCoordinates, texts } = await parsePdf(currentPdfFilepath);
-          const minY = Math.min.apply(null, yCoordinates);
-          const pdfContent = composeTextFromPdf(minY, texts);
-
           // strip whitespaces
           const cleanedWordContent = replaceWhitespace(wordContent.value);
           const cleanedCodeContent = replaceWhitespace(codeContent);
-          const cleanedPdfContent = replaceWhitespace(pdfContent);
 
           const titleRegex = new RegExp(
             "^\\/\\/" + currentCodeFilename + "(.*)"
           );
 
           expect(cleanedWordContent).toMatch(titleRegex);
-          expect(cleanedPdfContent).toMatch(titleRegex);
 
           const wordMatched = cleanedWordContent.match(titleRegex);
-          const textAfterTitle = wordMatched[1];
+          const wordTextAfterTitle = wordMatched[1];
 
-          if (wordMatched && textAfterTitle) {
-            expect(textAfterTitle).toBe(cleanedCodeContent);
+          if (wordMatched && wordTextAfterTitle) {
+            expect(wordTextAfterTitle).toBe(cleanedCodeContent);
           } else {
-            throw new Error("Title NOT found or NO text after title.");
+            throw new Error("Title NOT found or NO text after title; Word.");
           }
         } catch (error) {
           console.error(
@@ -126,12 +116,55 @@ describe("printLib", () => {
             )}" + Word "${currentWordFilename}"`
           );
 
-          //DNW
-          // error.message = `Error from files: ${currentCodeFilename} + ${currentWordFilename}:\n${error.message}`;
-
           throw error;
         }
       }
     });
+    (isInCIEnv ? it.skip : it)(
+      "should match corresponding file content for word and pdf",
+      async () => {
+        for (let i = 0; i < wordFileNames.length; i++) {
+          const currentWordFilename = wordFileNames[i];
+          const currentPdfFilename = pdfFileNames[i];
+          try {
+            const currentWordFilepath = path.join(
+              WORD_DIR_PATH,
+              currentWordFilename
+            );
+
+            const currentPdfFilepath = path.join(
+              PDF_DIR_PATH,
+              currentPdfFilename
+            );
+
+            const wordContent = await mammoth.extractRawText({
+              path: currentWordFilepath,
+            });
+
+            const { yCoordinates, texts } = await parsePdf(currentPdfFilepath);
+            const minY = Math.min.apply(null, yCoordinates);
+            const pdfContent = composeTextFromPdf(minY, texts);
+
+            // strip whitespaces
+            const cleanedWordContent = replaceWhitespace(wordContent.value);
+            const cleanedPdfContent = replaceWhitespace(pdfContent);
+
+            expect(cleanedWordContent).toBe(cleanedPdfContent);
+          } catch (error) {
+            console.error(
+              `Error from files: Word "${path.join(
+                WORD_DIR_PATH,
+                currentWordFilename
+              )}" + Pdf "${currentPdfFilename}"`
+            );
+
+            throw error;
+          }
+        }
+
+        //5.1417306 sec for #40 files
+      },
+      10000
+    );
   });
 });

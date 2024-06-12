@@ -192,9 +192,9 @@ async function printLib(url, opts) {
 
     const startPy = performance.now();
 
-    const pythonCmd = platform == "win32" ? "python" : "python3";
+    const pyScript = platform == "win32" ? "python" : "python3";
 
-    await asyncExecFile(pythonCmd, ["main.py"], {
+    await asyncExecFile(pyScript, ["main.py"], {
       encoding: "utf-8",
     });
     const endPy = performance.now();

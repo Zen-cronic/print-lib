@@ -1,6 +1,7 @@
 module.exports = {
   parsePdf,
   composeTextFromPdf,
+  isCI,
 };
 
 /**
@@ -50,4 +51,13 @@ function composeTextFromPdf(skipY, texts) {
   }
 
   return text;
+}
+
+/**
+ * Check for GitHub Actions CI
+ * @returns {boolean}
+ */
+function isCI() {
+  return process.env.CI === 'true'
+  
 }
