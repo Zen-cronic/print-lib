@@ -2,14 +2,19 @@ const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
 
-const {
+let {
   printLib,
   CODE_DIR_PATH,
   WORD_DIR_PATH,
   PDF_DIR_PATH,
 } = require("../../src");
 const { replaceWhitespace } = require("../../src/utils");
-const { parsePdf, composeTextFromPdf, isCI } = require("../../src/testUtils");
+const {
+  parsePdf,
+  composeTextFromPdf,
+  isCI,
+  isCacheReq,
+} = require("../../src/testUtils");
 
 describe("printLib", () => {
   let codeFilenames;
@@ -22,6 +27,15 @@ describe("printLib", () => {
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
     try {
+      const isCached = await isCacheReq();
+      console.log({isCached});
+      if (isCached) {
+        printLib = () => {
+          return Promise.resolve();
+        };
+        await printLib()
+
+      }
       // await printLib(url, {
       //   dir: true,
       //   recursive: true,
@@ -103,8 +117,11 @@ describe("printLib", () => {
           const wordMatched = cleanedWordContent.match(titleRegex);
           const wordTextAfterTitle = wordMatched[1];
 
+
           if (wordMatched && wordTextAfterTitle) {
-            expect(wordTextAfterTitle).toBe(cleanedCodeContent);
+            expect(wordTextAfterTitle).toBe(cleanedCodeContent 
+              
+            );
           } else {
             throw new Error("Title NOT found or NO text after title; Word.");
           }

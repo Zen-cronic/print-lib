@@ -1,7 +1,11 @@
+const fs = require("fs");
+const path = require("path");
+
 module.exports = {
   parsePdf,
   composeTextFromPdf,
   isCI,
+  isCacheReq,
 };
 
 /**
@@ -54,10 +58,43 @@ function composeTextFromPdf(skipY, texts) {
 }
 
 /**
- * Check for GitHub Actions CI
+ * Check if the environemnt is in GitHub Actions CI runner
  * @returns {boolean}
  */
 function isCI() {
-  return process.env.CI === 'true'
-  
+  return process.env.CI == "true";
+}
+
+/**
+ * Check if the request should be cached via noop in the .env.jest file
+ * @returns {Promise<boolean>}
+ */
+async function isCacheReq() {
+  const envJestFilePath = path.resolve(process.cwd(), ".env.jest");
+
+  const loadEnv = process.loadEnvFile;
+
+  let envObj = {};
+
+  // < v20.12.0
+  if (typeof loadEnv != "function") {
+    const envContent = await fs.promises.readFile(envJestFilePath, {
+      encoding: "utf-8",
+    });
+    const envArr = envContent.split("\n");
+    envObj = envArr.reduce((acc, curr) => {
+      if (curr) {
+        const [key, val] = curr.split("=");
+        acc[key] = val;
+      }
+
+      return acc;
+    }, {});
+  } else {
+    process.loadEnvFile((envJestFilePath));
+    envObj = { ...process.env };
+
+  }
+
+  return envObj.CACHE_REQUEST == "true";
 }
