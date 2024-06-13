@@ -2,44 +2,44 @@ const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
 
-const  {
+const {
   printLib,
   CODE_DIR_PATH,
   WORD_DIR_PATH,
   PDF_DIR_PATH,
 } = require("../../src");
-const { replaceWhitespace } = require("../../src/utils");
 const {
   parsePdf,
   composeTextFromPdf,
   isCI,
   isCacheReq,
 } = require("../../src/testUtils");
+const { replaceWhitespace } = require("../../src/utils");
 
 describe("printLib", () => {
   let codeFilenames;
   let wordFileNames;
   let pdfFileNames;
   const isInCIEnv = isCI();
-  const wordExtname = ".docx";
+  const WORD_EXTNAME = ".docx";
 
   beforeAll(async () => {
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
-    console.log({typeofLoadEnvFile: typeof process.loadEnvFile});
     try {
-      let printLibFn = printLib
+      let printLibFn = printLib;
 
-      const isCached = await isCacheReq();
+      const isCached =  isCacheReq();
+
       console.log({isCached});
       if (isCached) {
         printLibFn = () => {
           return Promise.resolve();
         };
-        
-
+        console.log("PrintLib called as stub");
       }
 
+      //either a stub or actual fn
       await printLibFn(url, {
         dir: true,
         recursive: true,
@@ -74,7 +74,7 @@ describe("printLib", () => {
         const codeExtname = path.extname(codeFilenames[i]);
 
         const currentCodeFilename = codeFilenames[i].replace(codeExtname, "");
-        const currentWordFilename = wordFileNames[i].replace(wordExtname, "");
+        const currentWordFilename = wordFileNames[i].replace(WORD_EXTNAME, "");
 
         expect(currentCodeFilename).toBe(currentWordFilename);
       }
@@ -120,7 +120,6 @@ describe("printLib", () => {
 
           const wordMatched = cleanedWordContent.match(titleRegex);
           const wordTextAfterTitle = wordMatched[1];
-
 
           if (wordMatched && wordTextAfterTitle) {
             expect(wordTextAfterTitle).toBe(cleanedCodeContent 

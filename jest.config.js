@@ -1,5 +1,5 @@
 /** @type {import('jest').Config} */
-require("dotenv").config({ path: "./.env.jest" });
+require("dotenv").config({ path: "./.env.jest" , override: true});
 
 const config = {
   reporters: ["default", "<rootDir>/customReporter.js"],

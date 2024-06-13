@@ -9,15 +9,15 @@ describe.skip("isCacheReq function", () => {
     });
     it("should return true if the CACHE_REQUEST is set to true", async () => {
       
-      process.env.CACHE_REQUEST = true;
-      const result = await isCacheReq();
+      // process.env.CACHE_REQUEST = true;
+      const result =  isCacheReq();
 
       expect(result).toBe(true);
     });
     it("should return false if the CACHE_REQUEST is not set or is false", async () => {
-      delete process.env.CACHE_REQUEST;
+      // delete process.env.CACHE_REQUEST;
 
-      const result = await isCacheReq();
+      const result =  isCacheReq();
       expect(result).toBe(false);
     });
   });

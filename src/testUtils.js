@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const {Logger} = require("scope-logger")
 
 module.exports = {
   parsePdf,
@@ -67,8 +68,10 @@ function isCI() {
 
 /**
  * Check if the request should be cached via noop in the .env.jest file
- * @returns {Promise<boolean>}
+ * @returns {boolean}
  */
 function isCacheReq() {
+  const logger = new Logger("CacheReq")
+  logger.log({cacheReq: process.env.CACHE_REQUEST})
   return process.env.CACHE_REQUEST == "true"
 }

@@ -1,6 +1,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const dotenv = require('dotenv');
 
 class MyReporter {
   constructor(globalConfig, options) {
@@ -20,8 +21,11 @@ class MyReporter {
       }
       else{
         console.warn("Failing test(s); Delete cache req")
-        await fs.promises.truncate(envFilePath, 0)
+        process.env.CACHE_REQUEST = false
+        // await fs.promises.truncate(envFilePath, 0)
       }
+
+      // dotenv.config({path: envFilePath})
     } catch (error) {
       throw error
     }
