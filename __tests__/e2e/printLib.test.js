@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const mammoth = require("mammoth");
 
-let {
+const  {
   printLib,
   CODE_DIR_PATH,
   WORD_DIR_PATH,
@@ -26,20 +26,24 @@ describe("printLib", () => {
   beforeAll(async () => {
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
+    console.log({typeofLoadEnvFile: typeof process.loadEnvFile});
     try {
+      let printLibFn = printLib
+
       const isCached = await isCacheReq();
       console.log({isCached});
       if (isCached) {
-        printLib = () => {
+        printLibFn = () => {
           return Promise.resolve();
         };
-        await printLib()
+        
 
       }
-      // await printLib(url, {
-      //   dir: true,
-      //   recursive: true,
-      // });
+
+      await printLibFn(url, {
+        dir: true,
+        recursive: true,
+      });
 
       const codeFilenamesPromise = fs.promises.readdir(CODE_DIR_PATH, {
         encoding: "utf-8",
