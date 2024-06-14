@@ -4,7 +4,7 @@ const path = require("path");
 module.exports = {
   transformUrlStr,
   ensureDirExists,
-  checkOpts,
+  // checkOpts,
   generateCodeFile,
   hasParentDir,
   toNumber,
@@ -14,36 +14,30 @@ module.exports = {
   cleanup,
 };
 
-/**
- * @typedef {Object} DefaultOpts
- * @property {boolean} [singleFile] - If true, only a single file will be processed.
- * @property {boolean} [dir] - If true, files in the directory will be processed.
- * @property {boolean} [recursive] - If true, the files will be processed recursively.
- */
 
-/**
- * @param {DefaultOpts} opts
- * @returns {DefaultOpts}
- */
-function checkOpts(opts) {
-  //null
-  if (typeof opts === "object" && !opts) {
-    const defaultOpts = {
-      singleFile: true,
-      dir: false,
-      recursive: false,
-    };
+// /**
+//  * @param {DefaultOpts} opts
+//  * @returns {DefaultOpts}
+//  */
+// function checkOpts(opts) {
+//   //null
+//   if (typeof opts === "object" && !opts) {
+//     const defaultOpts = {
+//       singleFile: true,
+//       dir: false,
+//       recursive: false,
+//     };
 
-    return defaultOpts;
-  }
-  if ((opts.singleFile && opts.dir) || (opts.singleFile && opts.recursive)) {
-    throw new Error(
-      `Options dir ${opts.dir} or recursive ${opts.recursive} cannot be set alongside singleFile ${opts.singleFile}`
-    );
-  }
+//     return defaultOpts;
+//   }
+//   if ((opts.singleFile && opts.dir) || (opts.singleFile && opts.recursive)) {
+//     throw new Error(
+//       `Options dir ${opts.dir} or recursive ${opts.recursive} cannot be set alongside singleFile ${opts.singleFile}`
+//     );
+//   }
 
-  return opts;
-}
+//   return opts;
+// }
 /**
  *
  * @param {string | URL} url
@@ -81,7 +75,7 @@ function transformUrlStr(url) {
 }
 
 /**
- *  Create dirs if it does NOT exist; Exit with 1 if error
+ *  Create dirs if it does NOT exist
  * @param {...string} dirPaths
  */
 function ensureDirExists(...dirPaths) {
@@ -93,7 +87,8 @@ function ensureDirExists(...dirPaths) {
     });
   } catch (error) {
     console.error(error);
-    process.exit(1);
+    // process.exit(1);
+    throw error
   }
 }
 

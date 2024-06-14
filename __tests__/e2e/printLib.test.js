@@ -7,7 +7,8 @@ const {
   CODE_DIR_PATH,
   WORD_DIR_PATH,
   PDF_DIR_PATH,
-} = require("../../src");
+} = require("../../src/index");
+
 const {
   parsePdf,
   composeTextFromPdf,
@@ -26,46 +27,47 @@ describe("printLib", () => {
   beforeAll(async () => {
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
-      let printLibMaybeStub = printLib;
+    let printLibMaybeStub = printLib;
 
-      const indicatorFilePath = path.resolve(
-        process.cwd(),
-        "__tests__",
-        "cacheRequestIndicator.txt"
-      );
+    const indicatorFilePath = path.resolve(
+      process.cwd(),
+      "__tests__",
+      "cacheRequestIndicator.txt"
+    );
 
-      const isCached = await isCacheReq(indicatorFilePath);
+    const isCached = await isCacheReq(indicatorFilePath);
 
-      // no stub in CI
-      if (isCached && !isInCIEnv) {
-        printLibMaybeStub = () => {
-          return Promise.resolve();
-        };
-        console.log("PrintLib called as stub");
-      }
+    // no stub in CI
+    if (isCached && !isInCIEnv) {
+      printLibMaybeStub = () => {
+        return Promise.resolve();
+      };
+      console.log("PrintLib called as stub");
+    }
 
-      //either a stub or actual fn
-      await printLibMaybeStub(url, {
-        dir: true,
-        recursive: true,
-      });
+    //either a stub or actual fn
+    await printLibMaybeStub({
+      link: url,
+      linkType: "recursive",
+      auth: process.env.GITHUB_ACCESS_TOKEN,
+      convertTo: "pdf",
+    });
 
-      const codeFilenamesPromise = fs.promises.readdir(CODE_DIR_PATH, {
-        encoding: "utf-8",
-      });
-      const wordFileNamesPromise = fs.promises.readdir(WORD_DIR_PATH, {
-        encoding: "utf-8",
-      });
-      const pdfFileNamesPromise = fs.promises.readdir(PDF_DIR_PATH, {
-        encoding: "utf-8",
-      });
+    const codeFilenamesPromise = fs.promises.readdir(CODE_DIR_PATH, {
+      encoding: "utf-8",
+    });
+    const wordFileNamesPromise = fs.promises.readdir(WORD_DIR_PATH, {
+      encoding: "utf-8",
+    });
+    const pdfFileNamesPromise = fs.promises.readdir(PDF_DIR_PATH, {
+      encoding: "utf-8",
+    });
 
-      [codeFilenames, wordFileNames, pdfFileNames] = await Promise.all([
-        codeFilenamesPromise,
-        wordFileNamesPromise,
-        pdfFileNamesPromise,
-      ]);
-   
+    [codeFilenames, wordFileNames, pdfFileNames] = await Promise.all([
+      codeFilenamesPromise,
+      wordFileNamesPromise,
+      pdfFileNamesPromise,
+    ]);
   }, 40000);
 
   describe("given a valid repository url is requested", () => {
