@@ -23,7 +23,16 @@ module.exports = {
   CODE_DIR_PATH,
   WORD_DIR_PATH,
   PDF_DIR_PATH,
+  execConversion,
 };
+
+/**
+ * @typedef {Object} ApiOpts
+ * @property {string} link - The github repo link
+ * @property {"file"|"dir"|"recursive"} linkType - The type of the github repo link
+ * @property {string} auth - The github access token
+ * @property {"word"|"pdf"} convertTo - The conversion format (pdf only available Win/macOS with MS Word installed and granted permission)
+ */
 
 /**
  * @public
@@ -37,44 +46,31 @@ async function printLib(opts) {
 
     ensureDirExists(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
 
-    switch (opts) {
-      case value:
+    switch (opts.linkType) {
+      case "file":
+        await printFile(url);
+        break;
+      case "dir":
+        await printDir(url);
+        break;
+      case "recursive":
+        await printRecursive(url);
         break;
 
       default:
-        break;
-    }
-    if (opts.linkType == "file") {
-      await printFile();
-    } else if (opts.linkType == "dir") {
-      await printDir();
-    } else if ("recursive") {
-      await printRecursive();
-    } else {
-      throw new Error(`Unsupported linkType: ${opts.linkType}`);
+        throw new Error(`Unsupported linkType: ${opts.linkType}`);
     }
 
-    //python || python3
-
-    const asyncExecFile = util.promisify(cp.execFile);
-
-    const startPy = performance.now();
-
-    const pyScript = platform == "win32" ? "python" : "python3";
-
-    await asyncExecFile(pyScript, ["main.py"], {
-      encoding: "utf-8",
-    });
-    const endPy = performance.now();
-    const diffPy = endPy - startPy;
-
-    console.log(`Time taken Py: ${diffPy / 1000} sec`);
+    await execConversion(opts.convertTo);
   } catch (error) {
     throw error;
   }
 }
 
-async function printFile() {
+/**
+ * @param {string} url - GitHub repo url
+ */
+async function printFile(url) {
   const res = await handleFetch(url);
   const { content, encoding, name } = res.data;
 
@@ -86,7 +82,10 @@ async function printFile() {
   generateCodeFile(CODE_DIR_PATH, name, decodedContent);
 }
 
-async function printDir() {
+/**
+ * @param {string} url - GitHub repo url
+ */
+async function printDir(url) {
   const res = await handleFetch(url);
 
   if (!isArray(res.data)) {
@@ -105,7 +104,10 @@ async function printDir() {
   }
 }
 
-async function printRecursive() {
+/**
+ * @param {string} url - GitHub repo url
+ */
+async function printRecursive(url) {
   const lastSlashIdx = url.lastIndexOf("/");
 
   const lastSegment = url.slice(lastSlashIdx + 1);
@@ -195,4 +197,37 @@ async function printRecursive() {
   const diffCodeGen = endGenCode - startGenCode;
 
   console.log(`Time taken Gen Code: ${diffCodeGen / 1000} sec`);
+}
+
+/**
+ * Execute work and pdf conversion process for all files in the "code" dir
+ * @param {"word" | "pdf"} convertTo
+ */
+async function execConversion(convertTo) {
+  if (convertTo !== "word" && convertTo !== "pdf") {
+    throw new Error(`Invalid conversion arg: '${convertTo}'`);
+  }
+
+  //python || python3
+  const asyncExecFile = util.promisify(cp.execFile);
+
+  const startPy = performance.now();
+
+  const pyScript = platform == "win32" ? "python" : "python3";
+
+  //fallback to word doc if arg = 'pdf' and platform = 'linux', etc.
+  if (platform != "win32" && platform != "darwin" && convertTo == "pdf") {
+    console.error(
+      `Provided convertTo arg: '${convertTo}' is only compatible with win32 or macOS; Current platform: ${platform}; Fallback to .docx conversion`
+    );
+
+    convertTo = "word";
+  }
+  await asyncExecFile(pyScript, ["main.py", convertTo], {
+    encoding: "utf-8",
+  });
+  const endPy = performance.now();
+  const diffPy = endPy - startPy;
+
+  console.log(`Time taken Py: ${diffPy / 1000} sec`);
 }

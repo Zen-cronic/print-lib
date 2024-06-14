@@ -1,3 +1,4 @@
+const { describe, it, expect } = require("@jest/globals");
 const { handleRateLimit } = require("../../src/request");
 const { toNumber, formatDate } = require("../../src/utils");
 

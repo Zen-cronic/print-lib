@@ -1,4 +1,5 @@
 import os
+import sys 
 
 from docx2pdf import convert
 
@@ -75,7 +76,9 @@ if __name__ == "__main__":
             
             create_docx(file_name, content)
 
-    convert(word_dir_name + "/", pdf_dir_name + "/")  
+    convertTo: str = sys.argv[1]
+    if(convertTo == "pdf"):
+        convert(word_dir_name + "/", pdf_dir_name + "/")  
 
 
 

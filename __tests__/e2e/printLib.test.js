@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const mammoth = require("mammoth");
+const { describe, it, expect, beforeAll } = require("@jest/globals");
 
 const {
   printLib,

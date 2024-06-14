@@ -8,7 +8,7 @@ const CACHE_REQUEST_INDICATOR_PATH =
 const config = {
   reporters: ["default", CACHE_REQUEST_REPORTER_PATH],
   watchPathIgnorePatterns: [
-    "<rootDir>/(misc|word|code|dev|pg|pdf)/",
+    "<rootDir>/(misc|word|code|dev|pg|pdf|coverage)/",
     CACHE_REQUEST_INDICATOR_PATH,
   ],
   testPathIgnorePatterns: [CACHE_REQUEST_REPORTER_PATH],

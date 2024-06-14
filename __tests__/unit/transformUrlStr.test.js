@@ -1,5 +1,5 @@
+const { describe, it, expect } = require("@jest/globals");
 const { transformUrlStr } = require("../../src/utils");
-
 
 describe("transformUrlStr function", () => {
   describe("given a valid url from github.com", () => {
