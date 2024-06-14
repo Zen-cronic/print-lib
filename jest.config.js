@@ -1,10 +1,13 @@
 /** @type {import('jest').Config} */
-require("dotenv").config({ path: "./.env.jest" , override: true});
 
 const config = {
-  reporters: ["default", "<rootDir>/customReporter.js"],
-  watchPathIgnorePatterns: ["<rootDir>/(misc|word|code|dev|pg|pdf)/", "<rootDir>/__tests__"],
-
+  reporters: ["default", "<rootDir>/__tests__/cacheRequestReporter.js"],
+  watchPathIgnorePatterns: [
+    "<rootDir>/(misc|word|code|dev|pg|pdf)/",
+    "<rootDir>/__tests__/cacheRequestIndicator.txt",
+  ],
+  testPathIgnorePatterns: ["<rootDir>/__tests__/cacheRequestReporter.js"],
+  setupFiles: ["dotenv/config"],
 };
 
 module.exports = config;

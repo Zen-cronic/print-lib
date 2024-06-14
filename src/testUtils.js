@@ -1,6 +1,5 @@
 const fs = require("fs");
-const path = require("path");
-const {Logger} = require("scope-logger")
+const { Logger } = require("scope-logger");
 
 module.exports = {
   parsePdf,
@@ -67,11 +66,29 @@ function isCI() {
 }
 
 /**
- * Check if the request should be cached via noop in the .env.jest file
- * @returns {boolean}
+ * Check if the request should be cached via by reading the indicator file
+ * @param {string} indicatorFilePath
+ * @returns {Promise<boolean>}
  */
-function isCacheReq() {
-  const logger = new Logger("CacheReq")
-  logger.log({cacheReq: process.env.CACHE_REQUEST})
-  return process.env.CACHE_REQUEST == "true"
+
+async function isCacheReq(indicatorFilePath) {
+  const logger = new Logger("CacheReq");
+
+  const indicatorContent = await fs.promises.readFile(indicatorFilePath, {
+    encoding: "utf-8",
+  });
+
+  const indicatorObj = indicatorContent.split("\n").reduce((acc, curr) => {
+    if (curr) {
+      const [key, val] = curr.split("=");
+
+      acc[key] = val;
+    }
+
+    return acc;
+  }, {});
+
+  logger.log({ indicatorContent });
+
+  return indicatorObj.CACHE_REQUEST == "true";
 }

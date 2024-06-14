@@ -1,5 +1,5 @@
-const path = require("path");
 const fs = require("fs");
+const path = require("path");
 const mammoth = require("mammoth");
 
 const {
@@ -29,9 +29,15 @@ describe("printLib", () => {
     try {
       let printLibFn = printLib;
 
-      const isCached =  isCacheReq();
+      const indicatorFilePath = path.resolve(
+        process.cwd(),
+        "__tests__",
+        "cacheRequestIndicator.txt"
+      );
 
-      console.log({isCached});
+      const isCached = await isCacheReq(indicatorFilePath);
+
+      console.log({ isCached });
       if (isCached) {
         printLibFn = () => {
           return Promise.resolve();
@@ -61,7 +67,8 @@ describe("printLib", () => {
         pdfFileNamesPromise,
       ]);
     } catch (error) {
-      console.error(`Error reading dir in setup`);
+      // console.error(`Error reading dir in setup`); or from printLib
+
       throw error;
     }
   }, 40000);
@@ -122,9 +129,7 @@ describe("printLib", () => {
           const wordTextAfterTitle = wordMatched[1];
 
           if (wordMatched && wordTextAfterTitle) {
-            expect(wordTextAfterTitle).toBe(cleanedCodeContent 
-              
-            );
+            expect(wordTextAfterTitle).toBe(cleanedCodeContent);
           } else {
             throw new Error("Title NOT found or NO text after title; Word.");
           }
