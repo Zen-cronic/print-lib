@@ -26,8 +26,7 @@ describe("printLib", () => {
   beforeAll(async () => {
     const url = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
 
-    try {
-      let printLibFn = printLib;
+      let printLibMaybeStub = printLib;
 
       const indicatorFilePath = path.resolve(
         process.cwd(),
@@ -37,16 +36,16 @@ describe("printLib", () => {
 
       const isCached = await isCacheReq(indicatorFilePath);
 
-      console.log({ isCached });
-      if (isCached) {
-        printLibFn = () => {
+      // no stub in CI
+      if (isCached && !isInCIEnv) {
+        printLibMaybeStub = () => {
           return Promise.resolve();
         };
         console.log("PrintLib called as stub");
       }
 
       //either a stub or actual fn
-      await printLibFn(url, {
+      await printLibMaybeStub(url, {
         dir: true,
         recursive: true,
       });
@@ -66,11 +65,7 @@ describe("printLib", () => {
         wordFileNamesPromise,
         pdfFileNamesPromise,
       ]);
-    } catch (error) {
-      // console.error(`Error reading dir in setup`); or from printLib
-
-      throw error;
-    }
+   
   }, 40000);
 
   describe("given a valid repository url is requested", () => {

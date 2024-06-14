@@ -6,6 +6,7 @@ class CacheRequestReporter {
     this._globalConfig = globalConfig;
     this._options = options;
   }
+  
   async onRunComplete(_, results) {
     console.log("Custom reporter output:");
 
@@ -18,22 +19,16 @@ class CacheRequestReporter {
     const indicatorStrTrue = "\nCACHE_REQUEST=true\n";
     const indicatorStrFalse = "\nCACHE_REQUEST=false\n";
 
-    //write to config/env file
-
     if (results.numFailedTestSuites == 0 && results.numFailedTests == 0) {
-      console.info("All tests passed; Set cache req to true");
       await fs.promises.writeFile(indicatorFilePath, indicatorStrTrue, {
         encoding: "utf-8",
       });
+      console.warn("All tests passed; Set cache req to true");
     } else {
-      // fs.writeFileSync(indicatorFilePath, indicatorStrFalse, {
-      //   encoding: "utf-8",
-      // });
       await fs.promises.writeFile(indicatorFilePath, indicatorStrFalse, {
         encoding: "utf-8",
       });
-      console.warn("Failing test(s); Delete cache req");
-
+      console.warn("Failing test(s); Set cache req to false");
     }
   }
 }

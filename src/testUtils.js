@@ -1,5 +1,4 @@
 const fs = require("fs");
-const { Logger } = require("scope-logger");
 
 module.exports = {
   parsePdf,
@@ -72,7 +71,6 @@ function isCI() {
  */
 
 async function isCacheReq(indicatorFilePath) {
-  const logger = new Logger("CacheReq");
 
   const indicatorContent = await fs.promises.readFile(indicatorFilePath, {
     encoding: "utf-8",
@@ -87,8 +85,6 @@ async function isCacheReq(indicatorFilePath) {
 
     return acc;
   }, {});
-
-  logger.log({ indicatorContent });
 
   return indicatorObj.CACHE_REQUEST == "true";
 }
