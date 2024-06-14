@@ -8,13 +8,14 @@
     "test": "jest --watchAll",
     "test:dynamic": "set NODE_OPTIONS=--experimental-vm-modules && jest --watchAll --no-cache",
     "test:ci": "export NODE_OPTIONS='--experimental-vm-modules' && jest --ci",
-    "clean": "node cleanup.js",
+    "clean": "node misc/cleanup.js",
     "dev": "node --watch",
+    "dev:env": "node --watch --env-file=.env",
     "dev:clean": "npm run cleanup && npm run dev"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "dotenv": "^16.4.5",
     "jest": "^29.7.0",
