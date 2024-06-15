@@ -38,7 +38,7 @@ async function customFetch(url, headers) {
     //default headerss
     headers = {
       Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${process.env.API_ACCESS_TOKEN}`,
       "X-GitHub-Api-Version": "2022-11-28",
       "User-Agent": "Zen-cronic",
     };

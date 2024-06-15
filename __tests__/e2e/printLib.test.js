@@ -50,7 +50,7 @@ describe("printLib", () => {
     await printLibMaybeStub({
       link: url,
       linkType: "recursive",
-      auth: process.env.GITHUB_ACCESS_TOKEN,
+      auth: process.env.API_ACCESS_TOKEN,
       convertTo: "pdf",
     });
 
