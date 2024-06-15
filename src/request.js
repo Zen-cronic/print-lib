@@ -31,10 +31,7 @@ async function handleFetch(url, headers) {
  * @returns {Promise<Response>}
  */
 async function customFetch(url, headers) {
-  //omit ltr; handle by api user
-  if (!process.env.GITHUB_ACCESS_TOKEN) {
-    throw new Error("Cannot access env vari");
-  }
+
   if (!headers) {
     //   https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#headers
 
