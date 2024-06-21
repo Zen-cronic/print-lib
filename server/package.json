@@ -1,0 +1,15 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "server": "node --watch index.js"
+  },
+  "keywords": [],
+  "author": "Kaung Zin Hein",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

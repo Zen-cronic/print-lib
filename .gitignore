@@ -1,32 +1,21 @@
-# Coverage directory used by tools like istanbul
+# Coverage
 coverage
 *.lcov
 
-
 # Dependency directories
 node_modules/
-jspm_packages/
-
-
-# Optional npm cache directory
-.npm
 
 # dotenv environment variable files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-.env.jest
+.env.*
 
-# material
+# Materials
 code
 word
 html
 pdf
 
-
-# dev-tests & pg
+# dev-tests & playground
 pg
 dev
 misc
@@ -34,3 +23,4 @@ misc
 # py related
 .venv
 __pycache__
+

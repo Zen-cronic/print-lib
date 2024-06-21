@@ -16,7 +16,8 @@
     "clean": "node misc/cleanup.js",
     "dev": "node --watch",
     "dev:env": "node --watch --env-file=.env",
-    "dev:clean": "npm run cleanup && npm run dev"
+    "dev:clean": "npm run cleanup && npm run dev",
+    "check:tarball": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz"
   },
   "keywords": [
     "print",

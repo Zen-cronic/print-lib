@@ -23,8 +23,9 @@ module.exports = {
  */
 function transformUrlStr(url) {
   if (typeof url != "string" && !(url instanceof URL)) {
+    const className = getClassName(url)
     throw new TypeError(
-      `Param must be of type string or URL; Received object: ${url} of type ${typeof url}`
+      `Param must be of type string or URL; Received object: ${url} of type ${className}`
     );
   }
 
