@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest --watchAll",
     "test:dynamic": "set NODE_OPTIONS=--experimental-vm-modules && jest --watchAll",
-    "test:ci": "export NODE_OPTIONS='--experimental-vm-modules' && jest --ci",
+    "test:ci": "cross-env NODE_OPTIONS='--experimental-vm-modules' && jest --ci",
     "clean": "node misc/cleanup.js",
     "dev": "node --watch",
     "dev:env": "node --watch --env-file=.env",
@@ -17,6 +17,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "jest": "^29.7.0",
     "mammoth": "^1.7.2",
