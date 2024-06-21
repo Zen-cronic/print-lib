@@ -13,6 +13,7 @@ const {
   isArray,
   cleanup,
 } = require("./utils");
+const { isCI } = require("./testUtils");
 
 const CODE_DIR_PATH = path.resolve(process.cwd(), "code");
 const WORD_DIR_PATH = path.resolve(process.cwd(), "word");
@@ -221,6 +222,9 @@ async function execConversion(convertTo) {
       `Provided convertTo arg: '${convertTo}' is only compatible with win32 or macOS; Current platform: ${platform}; Fallback to .docx conversion`
     );
 
+    convertTo = "word";
+  }
+  if (isCI()) {
     convertTo = "word";
   }
   await asyncExecFile(pyScript, ["main.py", convertTo], {
