@@ -4,7 +4,6 @@ const path = require("path");
 module.exports = {
   transformUrlStr,
   ensureDirExists,
-  // checkOpts,
   generateCodeFile,
   hasParentDir,
   toNumber,
@@ -12,6 +11,7 @@ module.exports = {
   formatDate,
   replaceWhitespace,
   cleanup,
+  humanizeContent
 };
 
 /**
@@ -20,17 +20,17 @@ module.exports = {
  * @returns {string}
  */
 function transformUrlStr(url) {
-  if (typeof url !== "string" && !(url instanceof URL)) {
+  if (typeof url != "string" && !(url instanceof URL)) {
     throw new TypeError(
       `Param must be of type string or URL; Received object: ${url} of type ${typeof url}`
     );
   }
 
-  if (typeof url === "string") {
+  if (typeof url == "string") {
     url = new URL(url);
   }
 
-  if (url.hostname !== "github.com") {
+  if (url.hostname != "github.com") {
     throw new Error(
       `Only support repos from github.com; Received hostname '${url.hostname}'`
     );
@@ -46,8 +46,8 @@ function transformUrlStr(url) {
 
   //ensure nu trailing /
 
-  const CONTENTS_API_URL = `https://api.github.com/repos/${owner}/${repoName}/contents/${repoPath}`;
-  return CONTENTS_API_URL;
+  const contents_api_url = `https://api.github.com/repos/${owner}/${repoName}/contents/${repoPath}`;
+  return contents_api_url;
 }
 
 /**
@@ -55,17 +55,11 @@ function transformUrlStr(url) {
  * @param {...string} dirPaths
  */
 function ensureDirExists(...dirPaths) {
-  try {
-    dirPaths.forEach((path) => {
-      if (!fs.existsSync(path)) {
-        fs.mkdirSync(path);
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    // process.exit(1);
-    throw error;
-  }
+  dirPaths.forEach((path) => {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path);
+    }
+  });
 }
 
 /**
@@ -76,9 +70,6 @@ function ensureDirExists(...dirPaths) {
  */
 async function generateCodeFile(dirPath, filename, content) {
   try {
-    // fs.writeFileSync(path.join(dirPath, filename), content, {
-    //   encoding: "utf-8",
-    // });
     await fs.promises.writeFile(path.join(dirPath, filename), content, {
       encoding: "utf-8",
     });
@@ -166,5 +157,16 @@ async function cleanup(...absPaths) {
   await Promise.all(promises);
 }
 
-//TC: decode base64
+/**
+ * Decode content (i.e., from base64 into utf-8)
+ * @param {string} content
+ * @param {string} encoding
+ * @returns {string}
+ */
+function humanizeContent(content, encoding) {
+  const encodedBuf = Buffer.from(content, encoding);
 
+  const decodedContent = encodedBuf.toString("utf-8");
+
+  return decodedContent;
+}

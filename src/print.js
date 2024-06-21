@@ -11,6 +11,7 @@ const {
   hasParentDir,
   isArray,
   cleanup,
+  humanizeContent,
 } = require("./utils");
 const { isCI } = require("./testUtils");
 
@@ -75,9 +76,7 @@ async function printFile(url) {
   const { content, encoding, name } = res.data;
 
   //base64
-  const encodedBuf = Buffer.from(content, encoding);
-
-  const decodedContent = encodedBuf.toString("utf-8");
+  const decodedContent = humanizeContent(content, encoding);
 
   generateCodeFile(CODE_DIR_PATH, name, decodedContent);
 }
@@ -177,8 +176,7 @@ async function printRecursive(url) {
           .join("-");
       }
 
-      const encodedBuf = Buffer.from(content, encoding);
-      const decodedContent = encodedBuf.toString("utf-8");
+      const decodedContent = humanizeContent(content, encoding);
       genCodeFilesPromises.push(
         generateCodeFile(CODE_DIR_PATH, fileName, decodedContent)
       );
