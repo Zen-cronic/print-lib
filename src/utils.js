@@ -11,7 +11,9 @@ module.exports = {
   formatDate,
   replaceWhitespace,
   cleanup,
-  humanizeContent
+  humanizeContent,
+  getClassName,
+  isPlainObject,
 };
 
 /**
@@ -112,9 +114,9 @@ function isArray(arr) {
  * @returns {string}
  */
 function formatDate(date) {
-  const className = Object.prototype.toString.call(date);
+  const className = getClassName(date);
 
-  if (!(date instanceof Date) || className !== "[object Date]") {
+  if (!(date instanceof Date) || className != "[object Date]") {
     throw new Error(
       `Expected Date object; Received "${date}" of type ${typeof date} | ${toStr.call(
         date
@@ -169,4 +171,22 @@ function humanizeContent(content, encoding) {
   const decodedContent = encodedBuf.toString("utf-8");
 
   return decodedContent;
+}
+
+/**
+ *
+ * @param {any} o
+ * @returns {string}
+ */
+function getClassName(o) {
+  return Object.prototype.toString.call(o);
+}
+
+/**
+ *
+ * @param {any} o
+ * @returns {boolean}
+ */
+function isPlainObject(o) {
+  return getClassName(o) == "[object Object]";
 }

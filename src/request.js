@@ -1,5 +1,10 @@
 const https = require("https");
-const { toNumber, formatDate } = require("./utils");
+const {
+  toNumber,
+  formatDate,
+  getClassName,
+  isPlainObject,
+} = require("./utils");
 
 module.exports = { handleFetch, handleRateLimit };
 
@@ -10,6 +15,18 @@ module.exports = { handleFetch, handleRateLimit };
  * @returns {Promise<RateLimitInfo & Response>}
  */
 async function handleFetch(url, headers) {
+  if (!headers) {
+    //   https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#headers
+
+    //default headers
+    headers = {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${process.env.API_ACCESS_TOKEN}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "Zen-cronic",
+    };
+  }
+
   const res = await customFetch(url, headers);
   const rateLimitInfo = handleRateLimit(res.headers);
 
@@ -27,25 +44,12 @@ async function handleFetch(url, headers) {
 /**
  *
  * @param {string | URL} url
- * @param {Object} [headers]
+ * @param {Object} headers
  * @returns {Promise<Response>}
  */
 async function customFetch(url, headers) {
-  if (!headers) {
-    //   https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#headers
-
-    //default headers
-    headers = {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${process.env.API_ACCESS_TOKEN}`,
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "Zen-cronic",
-    };
-  }
-
   const result = await new Promise((resolve, reject) => {
     const req = https.request(
-    
       url,
       {
         headers: headers,
@@ -119,8 +123,9 @@ async function customFetch(url, headers) {
  * @throws If rate limit exceeded or retry-after header is present
  */
 function handleRateLimit(headers) {
-  const className = Object.prototype.toString.call(headers);
-  if (className !== "[object Object]" || Array.isArray(headers)) {
+
+  if (!isPlainObject(headers) || Array.isArray(headers)) {
+    const className = getClassName(headers);
     throw new Error(
       `Must be [object Object]; Received "${JSON.stringify(headers)}" of type ${
         Array.isArray(headers) ? `Array` : className

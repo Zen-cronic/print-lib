@@ -18,7 +18,7 @@ const {
 } = require("../../src/testUtils");
 const { replaceWhitespace } = require("../../src/utils");
 
-describe("printLib", () => {
+describe("printLib function", () => {
   let codeFilenames;
   let wordFileNames;
   let pdfFileNames;
@@ -43,7 +43,7 @@ describe("printLib", () => {
       printLibMaybeStub = () => {
         return Promise.resolve();
       };
-      console.log("PrintLib called as stub");
+      console.log("printLib called as stub");
     }
 
     //either a stub or actual fn
@@ -143,7 +143,7 @@ describe("printLib", () => {
         }
       }
     });
-    
+
     //skip in CI
     (isInCIEnv ? it.skip : it)(
       "should match corresponding file content for word and pdf",
