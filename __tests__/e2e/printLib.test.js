@@ -71,6 +71,10 @@ describe("printLib", () => {
     ]);
   }, 40000);
 
+  describe('given env vari is set', () => {
+    
+    expect(process.env.API_ACCESS_TOKEN).toBeDefined()
+  });
   describe("given a valid repository url is requested", () => {
     it("should create corresponding files for code and word in the same order", () => {
       expect(codeFilenames.length).toBe(wordFileNames.length);
