@@ -2,7 +2,6 @@ const path = require("path");
 const cp = require("child_process");
 const util = require("util");
 const { platform } = require("process");
-const { performance } = require("perf_hooks");
 
 const { handleFetch } = require("./request");
 const {
@@ -152,7 +151,6 @@ async function printRecursive(url) {
 
   const genCodeFilesPromises = [];
 
-  const start = performance.now();
   for (f of contextFiles) {
     //nu f.size for {type: "tree", mode: "040000"}
     if (f.type == "blob" && f.mode === "100644" && typeof f.size === "number") {
@@ -186,18 +184,8 @@ async function printRecursive(url) {
       );
     }
   }
-  const end = performance.now();
-  const diff = end - start;
 
-  console.log(`Time taken 2+n requests: ${diff / 1000} sec`);
-
-  const startGenCode = performance.now();
   await Promise.all(genCodeFilesPromises);
-  const endGenCode = performance.now();
-
-  const diffCodeGen = endGenCode - startGenCode;
-
-  console.log(`Time taken Gen Code: ${diffCodeGen / 1000} sec`);
 }
 
 /**
@@ -211,8 +199,6 @@ async function execConversion(convertTo) {
 
   //python || python3
   const asyncExecFile = util.promisify(cp.execFile);
-
-  const startPy = performance.now();
 
   const pyScript = platform == "win32" ? "python" : "python3";
 
@@ -231,8 +217,4 @@ async function execConversion(convertTo) {
   await asyncExecFile(pyScript, ["main.py", convertTo], {
     encoding: "utf-8",
   });
-  const endPy = performance.now();
-  const diffPy = endPy - startPy;
-
-  console.log(`Time taken Py: ${diffPy / 1000} sec`);
 }
