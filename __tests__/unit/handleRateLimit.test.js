@@ -1,6 +1,7 @@
 const { describe, it, expect } = require("@jest/globals");
 const { handleRateLimit } = require("../../src/request");
 const { toNumber, formatDate } = require("../../src/utils");
+const { isCI } = require("../../src/testUtils");
 
 describe("handleRateLimit function", () => {
   const origHeaders = {
@@ -11,12 +12,7 @@ describe("handleRateLimit function", () => {
     "x-ratelimit-resource": "core",
   };
 
-  describe("basic sanity ", () => {
-    it("should first", () => {
-      expect(true).toBe(true);
-    });
-  });
-
+  
   describe("given the rate limit has reached 50%", () => {
     it("should transform the return object accordingly", () => {
       const headers = {
@@ -26,7 +22,9 @@ describe("handleRateLimit function", () => {
       };
       const result = handleRateLimit(headers);
       const expected = {
-        resetDateTime: "Fri, May 31, 2024, 7:40:31 PM",
+        resetDateTime: isCI()
+          ? "Fri, May 31, 2024, 11:40:31 PM"
+          : "Fri, May 31, 2024, 7:40:31 PM",
         limit: 5000,
         used: 2500,
         reset: 1717198831,
@@ -45,8 +43,11 @@ describe("handleRateLimit function", () => {
         "x-ratelimit-remaining": "0",
       };
 
-      const errMsg =
-        "Ratelimit almost reached or exceeded: 100%; Used: 5000; Limit: 5000;\nTry again after: Fri, May 31, 2024, 7:40:31 PM";
+      //CI uses UTC
+      const dateStr = isCI()
+        ? "Fri, May 31, 2024, 11:40:31 PM"
+        : "Fri, May 31, 2024, 7:40:31 PM";
+      const errMsg = `Ratelimit almost reached or exceeded: 100%; Used: 5000; Limit: 5000;\nTry again after: ${dateStr}`;
 
       expect(() => {
         handleRateLimit(headers);

@@ -31,7 +31,6 @@ async function handleFetch(url, headers) {
  * @returns {Promise<Response>}
  */
 async function customFetch(url, headers) {
-
   if (!headers) {
     //   https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#headers
 
@@ -119,10 +118,11 @@ async function customFetch(url, headers) {
  * @throws If rate limit exceeded or retry-after header is present
  */
 function handleRateLimit(headers) {
-  if (headers.toString() != "[object Object]" || Array.isArray(headers)) {
+  const className = Object.prototype.toString.call(headers);
+  if (className !== "[object Object]" || Array.isArray(headers)) {
     throw new Error(
       `Must be [object Object]; Received "${JSON.stringify(headers)}" of type ${
-        Array.isArray(headers) ? `Array` : typeof headers
+        Array.isArray(headers) ? `Array` : className
       }`
     );
   }
@@ -144,7 +144,7 @@ function handleRateLimit(headers) {
     );
   }
 
-  const resetDateTime = formatDate(new Date(reset * 1000))
+  const resetDateTime = formatDate(new Date(reset * 1000));
 
   const usedPercentage = Math.ceil((used / limit) * 100);
 

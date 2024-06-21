@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { isCI } = require("./testUtils");
 
 module.exports = {
   transformUrlStr,
@@ -13,7 +14,6 @@ module.exports = {
   replaceWhitespace,
   cleanup,
 };
-
 
 // /**
 //  * @param {DefaultOpts} opts
@@ -88,7 +88,7 @@ function ensureDirExists(...dirPaths) {
   } catch (error) {
     console.error(error);
     // process.exit(1);
-    throw error
+    throw error;
   }
 }
 
@@ -106,7 +106,6 @@ async function generateCodeFile(dirPath, filename, content) {
     await fs.promises.writeFile(path.join(dirPath, filename), content, {
       encoding: "utf-8",
     });
-
   } catch (err) {
     console.error(`Error writing file ${filename}: ${err}`);
     throw err;
@@ -146,9 +145,9 @@ function isArray(arr) {
  * @returns {string}
  */
 function formatDate(date) {
-  const toStr = Object.prototype.toString;
+  const className = Object.prototype.toString.call(date);
 
-  if (!(date instanceof Date) || toStr.call(date) !== "[object Date]") {
+  if (!(date instanceof Date) || className !== "[object Date]") {
     throw new Error(
       `Expected Date object; Received "${date}" of type ${typeof date} | ${toStr.call(
         date
@@ -187,10 +186,9 @@ async function cleanup(...absPaths) {
   const promises = [];
   for (const path of absPaths) {
     promises.push(fs.promises.rm(path, { recursive: true, force: true }));
-
   }
-  await Promise.all(promises)
- 
+  await Promise.all(promises);
 }
 
 //TC: decode base64
+
