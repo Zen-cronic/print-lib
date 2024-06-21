@@ -6,31 +6,40 @@ const {
   isPlainObject,
 } = require("./utils");
 
-module.exports = { handleFetch, handleRateLimit };
-
 /**
- * Composed of customFetch & handleRateLimit
- * @param {string | URL} url
- * @param {Object} [headers]
- * @returns {Promise<RateLimitInfo & Response>}
+ * Handles auth and userAgent
  */
-async function handleFetch(url, headers) {
-  if (!headers) {
-    //   https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#headers
-
-    //default headers
-    headers = {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${process.env.API_ACCESS_TOKEN}`,
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "Zen-cronic",
-    };
+class RequestHandler {
+  constructor(auth, userAgent) {
+    if (!auth || !userAgent) {
+      throw new Error(
+        `Required params: auth and userAgent;`
+      );
+    }
+    this.auth = auth;
+    this.userAgent = userAgent;
   }
 
-  const res = await customFetch(url, headers);
-  const rateLimitInfo = handleRateLimit(res.headers);
+  /**
+   * Composed of customFetch & handleRateLimit
+   * @param {string | URL} url
+   * @returns {Promise<RateLimitInfo & Response>}
+   */
+  async handleFetch(url) {
+    //   https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#headers
 
-  return { ...res, ...rateLimitInfo };
+    const headers = {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${this.auth}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": this.userAgent,
+    };
+
+    const res = await customFetch(url, headers);
+    const rateLimitInfo = handleRateLimit(res.headers);
+
+    return { ...res, ...rateLimitInfo };
+  }
 }
 
 /**
@@ -47,7 +56,12 @@ async function handleFetch(url, headers) {
  * @param {Object} headers
  * @returns {Promise<Response>}
  */
+
 async function customFetch(url, headers) {
+  if (!isPlainObject(headers)) {
+    const className = getClassName(headers);
+    throw new Error(`Must be [object Object]; Received ${className}`);
+  }
   const result = await new Promise((resolve, reject) => {
     const req = https.request(
       url,
@@ -123,7 +137,6 @@ async function customFetch(url, headers) {
  * @throws If rate limit exceeded or retry-after header is present
  */
 function handleRateLimit(headers) {
-
   if (!isPlainObject(headers) || Array.isArray(headers)) {
     const className = getClassName(headers);
     throw new Error(
@@ -178,3 +191,5 @@ function handleRateLimit(headers) {
 
   return { resetDateTime, limit, used, remaining, resource, reset };
 }
+
+module.exports = { handleRateLimit, RequestHandler };

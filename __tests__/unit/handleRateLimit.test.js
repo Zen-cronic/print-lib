@@ -1,6 +1,6 @@
 const { describe, it, expect } = require("@jest/globals");
-const { handleRateLimit } = require("../../src/request");
 const { toNumber, formatDate } = require("../../src/utils");
+const { handleRateLimit } = require("../../src/RequestHandler");
 const { isCI } = require("../../src/testUtils");
 
 describe("handleRateLimit function", () => {
@@ -13,10 +13,10 @@ describe("handleRateLimit function", () => {
   };
 
   //ltr: UTC_EST && LOCAL_EST
-  const UTC_EDT = "Fri, May 31, 2024, 11:40:31 PM"
-  const LOCAL_EDT = "Fri, May 31, 2024, 7:40:31 PM"
+  const UTC_EDT = "Fri, May 31, 2024, 11:40:31 PM";
+  const LOCAL_EDT = "Fri, May 31, 2024, 7:40:31 PM";
 
-  const usedDateTime = isCI() ? UTC_EDT: LOCAL_EDT
+  const usedDateTime = isCI() ? UTC_EDT : LOCAL_EDT;
 
   describe("given the rate limit has reached 50%", () => {
     it("should transform the return object accordingly", () => {
@@ -46,7 +46,7 @@ describe("handleRateLimit function", () => {
         "x-ratelimit-remaining": "0",
       };
 
-      const dateStr = usedDateTime
+      const dateStr = usedDateTime;
       const errMsg = `Ratelimit almost reached or exceeded: 100%; Used: 5000; Limit: 5000;\nTry again after: ${dateStr}`;
 
       expect(() => {

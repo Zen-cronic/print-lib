@@ -3,7 +3,7 @@ const cp = require("child_process");
 const util = require("util");
 const { platform } = require("process");
 
-const { handleFetch } = require("./request");
+const { RequestHandler } = require("./RequestHandler");
 const {
   transformUrlStr,
   ensureDirExists,
@@ -31,7 +31,8 @@ module.exports = {
  * @typedef {Object} ApiOpts
  * @property {string} link - The github repo link
  * @property {"file"|"dir"|"recursive"} linkType - The type of the github repo link
- * @property {string} auth - The github access token
+ * @property {string} auth - Your github access token
+ * @property {string} userAgent - Your github username or app name
  * @property {"word"|"pdf"} convertTo - The conversion format (pdf only available Win/macOS with MS Word installed and granted permission)
  */
 
@@ -47,15 +48,17 @@ async function printLib(opts) {
 
     ensureDirExists(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
 
+    const reqHandler = new RequestHandler(opts.auth, opts.userAgent);
+
     switch (opts.linkType) {
       case "file":
-        await printFile(url);
+        await printFile(url, reqHandler);
         break;
       case "dir":
-        await printDir(url);
+        await printDir(url, reqHandler);
         break;
       case "recursive":
-        await printRecursive(url);
+        await printRecursive(url, reqHandler);
         break;
 
       default:
@@ -70,9 +73,10 @@ async function printLib(opts) {
 
 /**
  * @param {string} url - GitHub repo url
+ * @param {RequestHandler} reqHandler
  */
-async function printFile(url) {
-  const res = await handleFetch(url);
+async function printFile(url, reqHandler) {
+  const res = await reqHandler.handleFetch(url);
   const { content, encoding, name } = res.data;
 
   //base64
@@ -83,9 +87,10 @@ async function printFile(url) {
 
 /**
  * @param {string} url - GitHub repo url
+ * @param {RequestHandler} reqHandler
  */
-async function printDir(url) {
-  const res = await handleFetch(url);
+async function printDir(url, reqHandler) {
+  const res = await reqHandler.handleFetch(url);
 
   if (!isArray(res.data)) {
     throw new Error(
@@ -98,15 +103,16 @@ async function printDir(url) {
 
   //files.foreach - does NOT wait
   for (const f of files) {
-    const res = await handleFetch(f.download_url);
+    const res = await reqHandler.handleFetch(f.download_url);
     generateCodeFile(CODE_DIR_PATH, f.name, res.data);
   }
 }
 
 /**
  * @param {string} url - GitHub repo url
+ * @param {RequestHandler} reqHandler
  */
-async function printRecursive(url) {
+async function printRecursive(url, reqHandler) {
   const lastSlashIdx = url.lastIndexOf("/");
 
   const lastSegment = url.slice(lastSlashIdx + 1);
@@ -114,7 +120,7 @@ async function printRecursive(url) {
   //contents api for parent dir
   const parentDirUrl = url.slice(0, lastSlashIdx);
 
-  const res = await handleFetch(parentDirUrl);
+  const res = await reqHandler.handleFetch(parentDirUrl);
 
   const parentFiles = res.data;
 
@@ -137,7 +143,7 @@ async function printRecursive(url) {
 
   const recursiveDirTreeUrl = contextDirTreeUrl.concat("?recursive=true");
 
-  const contextRes = await handleFetch(recursiveDirTreeUrl);
+  const contextRes = await reqHandler.handleFetch(recursiveDirTreeUrl);
 
   const contextFiles = contextRes.data.tree;
 
@@ -153,7 +159,7 @@ async function printRecursive(url) {
   for (f of contextFiles) {
     //nu f.size for {type: "tree", mode: "040000"}
     if (f.type == "blob" && f.mode === "100644" && typeof f.size === "number") {
-      const fileRes = await handleFetch(f.url);
+      const fileRes = await reqHandler.handleFetch(f.url);
 
       const { content, encoding } = fileRes.data;
 

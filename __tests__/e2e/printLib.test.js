@@ -51,6 +51,7 @@ describe("printLib function", () => {
       link: url,
       linkType: "recursive",
       auth: process.env.API_ACCESS_TOKEN,
+      userAgent: "Zen-cronic",
       convertTo: "pdf",
     });
 
