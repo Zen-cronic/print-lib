@@ -1,11 +1,16 @@
 {
   "name": "print-lib",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "bin": "./bin/printLib",
+  "description": "Print a GitHub repository's code as .docx or .pdf files",
+  "author": "Kaung Zin Hein",
+  "license": "MIT",
+  "main": "./src/index.js",
+  "files": [
+    "/src",
+    "/python",
+    "requirements.txt"
+  ],
   "scripts": {
-    "test": "jest --watchAll",
     "test:dynamic": "set NODE_OPTIONS=--experimental-vm-modules && jest --watchAll",
     "test:ci": "cross-env NODE_OPTIONS=--experimental-vm-modules && jest --ci",
     "clean": "node misc/cleanup.js",
@@ -13,9 +18,17 @@
     "dev:env": "node --watch --env-file=.env",
     "dev:clean": "npm run cleanup && npm run dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
+  "keywords": [
+    "print",
+    "library",
+    "lib",
+    "github",
+    "nodejs",
+    "python",
+    "docx",
+    "pdf"
+  ],
+  
   "devDependencies": {
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",

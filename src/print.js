@@ -218,7 +218,7 @@ async function execConversion(convertTo) {
     convertTo = "word";
   }
 
-  await asyncExecFile(pyScript, ["main.py", convertTo], {
+  await asyncExecFile(pyScript, ["./python/main.py", convertTo], {
     encoding: "utf-8",
   });
 }
