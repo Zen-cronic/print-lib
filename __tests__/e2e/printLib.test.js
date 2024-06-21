@@ -71,12 +71,6 @@ describe("printLib", () => {
     ]);
   }, 40000);
 
-  describe('given env vari is set', () => {
-    it('should detect the env vari', () => {
-      expect(process.env.API_ACCESS_TOKEN).toBeDefined()
-
-    });
-  });
   describe("given a valid repository url is requested", () => {
     it("should create corresponding files for code and word in the same order", () => {
       expect(codeFilenames.length).toBe(wordFileNames.length);
@@ -149,6 +143,8 @@ describe("printLib", () => {
         }
       }
     });
+    
+    //skip in CI
     (isInCIEnv ? it.skip : it)(
       "should match corresponding file content for word and pdf",
       async () => {

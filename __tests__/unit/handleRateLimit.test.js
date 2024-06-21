@@ -3,7 +3,7 @@ const { handleRateLimit } = require("../../src/request");
 const { toNumber, formatDate } = require("../../src/utils");
 const { isCI } = require("../../src/testUtils");
 
-describe.skip("handleRateLimit function", () => {
+describe("handleRateLimit function", () => {
   const origHeaders = {
     "x-ratelimit-limit": "5000",
     "x-ratelimit-remaining": "0",
