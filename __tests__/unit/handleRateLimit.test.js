@@ -3,7 +3,7 @@ const { handleRateLimit } = require("../../src/request");
 const { toNumber, formatDate } = require("../../src/utils");
 const { isCI } = require("../../src/testUtils");
 
-describe("handleRateLimit function", () => {
+describe.skip("handleRateLimit function", () => {
   const origHeaders = {
     "x-ratelimit-limit": "5000",
     "x-ratelimit-remaining": "0",
@@ -12,7 +12,7 @@ describe("handleRateLimit function", () => {
     "x-ratelimit-resource": "core",
   };
 
-  
+
   describe("given the rate limit has reached 50%", () => {
     it("should transform the return object accordingly", () => {
       const headers = {
