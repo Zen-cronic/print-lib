@@ -216,17 +216,18 @@ async function execConversion(convertTo) {
 
   const pyScript = platform == "win32" ? "python" : "python3";
 
+  if (isCI()) {
+    convertTo = "word";
+  }
   //fallback to word doc if arg = 'pdf' and platform = 'linux', etc.
-  if (platform != "win32" && platform != "darwin" && convertTo == "pdf") {
+  else if (platform != "win32" && platform != "darwin" && convertTo == "pdf") {
     console.error(
       `Provided convertTo arg: '${convertTo}' is only compatible with win32 or macOS; Current platform: ${platform}; Fallback to .docx conversion`
     );
 
     convertTo = "word";
   }
-  if (isCI()) {
-    convertTo = "word";
-  }
+
   await asyncExecFile(pyScript, ["main.py", convertTo], {
     encoding: "utf-8",
   });
