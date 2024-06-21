@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const { isCI } = require("./testUtils");
 
 module.exports = {
   transformUrlStr,
@@ -15,29 +14,6 @@ module.exports = {
   cleanup,
 };
 
-// /**
-//  * @param {DefaultOpts} opts
-//  * @returns {DefaultOpts}
-//  */
-// function checkOpts(opts) {
-//   //null
-//   if (typeof opts === "object" && !opts) {
-//     const defaultOpts = {
-//       singleFile: true,
-//       dir: false,
-//       recursive: false,
-//     };
-
-//     return defaultOpts;
-//   }
-//   if ((opts.singleFile && opts.dir) || (opts.singleFile && opts.recursive)) {
-//     throw new Error(
-//       `Options dir ${opts.dir} or recursive ${opts.recursive} cannot be set alongside singleFile ${opts.singleFile}`
-//     );
-//   }
-
-//   return opts;
-// }
 /**
  *
  * @param {string | URL} url

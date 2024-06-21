@@ -12,6 +12,11 @@ describe("handleRateLimit function", () => {
     "x-ratelimit-resource": "core",
   };
 
+  //ltr: UTC_EST && LOCAL_EST
+  const UTC_EDT = "Fri, May 31, 2024, 11:40:31 PM"
+  const LOCAL_EDT = "Fri, May 31, 2024, 7:40:31 PM"
+
+  const usedDateTime = isCI() ? UTC_EDT: LOCAL_EDT
 
   describe("given the rate limit has reached 50%", () => {
     it("should transform the return object accordingly", () => {
@@ -22,9 +27,7 @@ describe("handleRateLimit function", () => {
       };
       const result = handleRateLimit(headers);
       const expected = {
-        resetDateTime: isCI()
-          ? "Fri, May 31, 2024, 11:40:31 PM"
-          : "Fri, May 31, 2024, 7:40:31 PM",
+        resetDateTime: usedDateTime,
         limit: 5000,
         used: 2500,
         reset: 1717198831,
@@ -43,10 +46,7 @@ describe("handleRateLimit function", () => {
         "x-ratelimit-remaining": "0",
       };
 
-      //CI uses UTC
-      const dateStr = isCI()
-        ? "Fri, May 31, 2024, 11:40:31 PM"
-        : "Fri, May 31, 2024, 7:40:31 PM";
+      const dateStr = usedDateTime
       const errMsg = `Ratelimit almost reached or exceeded: 100%; Used: 5000; Limit: 5000;\nTry again after: ${dateStr}`;
 
       expect(() => {
