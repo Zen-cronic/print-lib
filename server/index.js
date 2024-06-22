@@ -22,7 +22,6 @@ app.get("/v1", async (req, res) => {
   // userAgent: string;
   // convertTo: "word" | "pdf";
 
-  //  const opts = req.body;
   const opts = {};
 
   //fixed
@@ -35,7 +34,21 @@ app.get("/v1", async (req, res) => {
   opts["userAgent"] = "Zen-cronic";
   try {
     await printLib(opts);
-    //send zip (or) singleFile
+    //send zip "dir|recursive" (or) singleFile "file" .docx
+
+    switch (opts.linkType) {
+      case "file":
+        break;
+
+      case "dir":
+      case "recursive":
+
+        //send zip of word dir
+        break;
+
+      default:
+        break;
+    }
     return res.status(200).send("File gen success!");
   } catch (error) {
     console.error("Error calling printLib:\n", error);

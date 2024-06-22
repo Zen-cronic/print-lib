@@ -11,6 +11,6 @@
   "description": "",
   "dependencies": {
     "express": "^4.19.2",
-    "print-lib": "^1.0.0"
+    "print-lib": "^1.0.1"
   }
 }
