@@ -1,5 +1,5 @@
 const express = require("express");
-const { printLib } = require("../src/index");
+const { printLib } = require("print-lib");
 
 const PORT = process.env.PORT || 5000;
 

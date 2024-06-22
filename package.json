@@ -5,6 +5,7 @@
   "author": "Kaung Zin Hein",
   "license": "MIT",
   "main": "./src/index.js",
+  "types": "./src/index.d.ts",
   "files": [
     "/src",
     "/python",
