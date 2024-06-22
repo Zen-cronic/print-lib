@@ -218,7 +218,7 @@ async function execConversion(convertTo) {
     convertTo = "word";
   }
 
-  const scriptPath = path.resolve(process.cwd(), "python", "main.py");
+  const scriptPath = path.join(__dirname, "..", "python", "main.py");
   await asyncExecFile(pyScript, [scriptPath, convertTo], {
     encoding: "utf-8",
   });
