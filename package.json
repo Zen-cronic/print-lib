@@ -15,6 +15,7 @@
   "scripts": {
     "test:dynamic": "set NODE_OPTIONS=--experimental-vm-modules && jest --watchAll",
     "test:ci": "cross-env NODE_OPTIONS=--experimental-vm-modules && jest --ci",
+    "test": "jest --watchAll",
     "clean": "node misc/cleanup.js",
     "dev": "node --watch",
     "dev:env": "node --watch --env-file=.env",

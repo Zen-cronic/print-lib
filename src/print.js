@@ -18,6 +18,7 @@ const { isCI } = require("./testUtils");
 const CODE_DIR_PATH = path.resolve(process.cwd(), "code");
 const WORD_DIR_PATH = path.resolve(process.cwd(), "word");
 const PDF_DIR_PATH = path.resolve(process.cwd(), "pdf");
+const GITHUB_RATE_LIMIT_ENDPOINT = "https://api.github.com/rate_limit";
 
 module.exports = {
   printLib,
@@ -25,6 +26,7 @@ module.exports = {
   WORD_DIR_PATH,
   PDF_DIR_PATH,
   execConversion,
+  checkRateLimit,
 };
 
 /**
@@ -222,4 +224,34 @@ async function execConversion(convertTo) {
   await asyncExecFile(pyScript, [scriptPath, convertTo], {
     encoding: "utf-8",
   });
+}
+
+/**
+ * @typedef {Object} RateLimitInfoCore
+ * @property {number} limit - The maximum number of requests that the consumer is permitted to make.
+ * @property {number} used - The number of requests that have been made.
+ * @property {number} remaining - The number of requests allowed before the rate limit is reached.
+ * @property {number} reset - The time at which the current rate limit window resets in UTC epoch seconds.
+ */
+/**
+ * Logs and return the rate limit information based on your GitHub token
+ * @param {string} auth
+ * @param {string} userAgent
+ * @returns {Promise<RateLimitInfoCore>}
+ */
+async function checkRateLimit(auth, userAgent) {
+  if (typeof auth != "string" || typeof userAgent != "string") {
+    throw new Error("Required params must be of type string");
+  }
+  const reqHandler = new RequestHandler(auth, userAgent);
+  const res = await reqHandler.handleFetch(GITHUB_RATE_LIMIT_ENDPOINT);
+
+  const { resources } = res.data;
+
+  const { core } = resources;
+
+  console.log(`Ratelimit reset at: ${res.resetDateTime}`);
+  console.log(JSON.stringify(core, null, 2));
+
+  return core;
 }

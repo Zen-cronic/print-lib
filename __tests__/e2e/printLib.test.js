@@ -8,7 +8,7 @@ const {
   CODE_DIR_PATH,
   WORD_DIR_PATH,
   PDF_DIR_PATH,
-} = require("../../src/index");
+} = require("../../src");
 
 const {
   parsePdf,

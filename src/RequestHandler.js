@@ -10,13 +10,13 @@ const {
  * Handles auth and userAgent
  */
 class RequestHandler {
+  #auth = null;
+
   constructor(auth, userAgent) {
     if (!auth || !userAgent) {
-      throw new Error(
-        `Required params: auth and userAgent;`
-      );
+      throw new Error(`Required params: auth and userAgent;`);
     }
-    this.auth = auth;
+    this.#auth = auth;
     this.userAgent = userAgent;
   }
 
@@ -30,7 +30,7 @@ class RequestHandler {
 
     const headers = {
       Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${this.auth}`,
+      Authorization: `Bearer ${this.#auth}`,
       "X-GitHub-Api-Version": "2022-11-28",
       "User-Agent": this.userAgent,
     };
