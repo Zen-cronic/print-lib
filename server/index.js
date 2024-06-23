@@ -37,6 +37,7 @@ app.get("/v1", async (req, res) => {
     //send zip "dir|recursive" (or) singleFile "file" .docx
 
     switch (opts.linkType) {
+      //res.download(file)
       case "file":
         break;
 
@@ -47,6 +48,7 @@ app.get("/v1", async (req, res) => {
         break;
 
       default:
+        //error
         break;
     }
     return res.status(200).send("File gen success!");
