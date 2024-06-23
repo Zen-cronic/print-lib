@@ -10,6 +10,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
+    "archiver": "^7.0.1",
     "express": "^4.19.2",
     "print-lib": "^1.0.2"
   }

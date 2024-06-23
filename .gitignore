@@ -15,6 +15,7 @@ word
 html
 pdf
 prod
+**/*.zip
 
 # dev-tests & playground
 pg
