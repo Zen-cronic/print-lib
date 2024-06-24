@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const archiver = require("archiver");
 const express = require("express");
-const { printLib } = require("print-lib");
+const { printLib, WORD_DIR_PATH } = require("print-lib");
 
 const PORT = process.env.PORT || 5000;
 
@@ -17,7 +17,13 @@ app.get("/healthcheck", (req, res) => {
 });
 
 // curl http://localhost:5000/v1
-// test download files:  curl --output word-server.zip  http://localhost:5000/v1
+
+// test download dir/recursive files:
+// curl --output word-server.zip  http://localhost:5000/v1
+
+// test single file
+// curl -O -J http://localhost:5000/v1
+
 app.get("/v1", async (req, res) => {
   //ApiOpts
   //   link: string;
@@ -31,46 +37,42 @@ app.get("/v1", async (req, res) => {
   //fixed
   opts["convertTo"] = "word";
 
-    //dev
-  
+  //dev
+
   // recursive
   // opts["link"] = "https://github.com/mwilliamson/mammoth.js/tree/master/lib";
   // opts["linkType"] = "recursive";
 
   // singleFile
-  opts["link"] = "https://github.com/mwilliamson/mammoth.js/blob/master/lib/document-to-html.js";
+  opts["link"] =
+    "https://github.com/mwilliamson/mammoth.js/blob/master/lib/document-to-html.js";
   opts["linkType"] = "file";
+
   opts["auth"] = process.env.API_ACCESS_TOKEN;
   opts["userAgent"] = "Zen-cronic";
   try {
     //stub while dev test
-    // await printLib(opts);
+    await printLib(opts);
 
     //send zip "dir|recursive" (or) singleFile "file" .docx
 
     let resDownloadPath;
 
     switch (opts.linkType) {
-      //res.download(file)
       case "file":
+        const [singleDocxFile] = await fs.promises.readdir(WORD_DIR_PATH);
 
+        const singleDocxFilePath = path.join(WORD_DIR_PATH, singleDocxFile);
 
+        resDownloadPath = singleDocxFilePath;
         break;
 
       case "dir":
       case "recursive":
-        //send zip of word dir
 
-        const outPathAbs = path.join(__dirname, "word.zip");
-        const srcPathAbs = path.join(__dirname, "word");
+        const outPathAbs = path.resolve(process.cwd(), "word.zip");
 
-        if (!fs.existsSync(srcPathAbs)) {
-          throw new Error(
-            `Path Does Not Exist for zip conversion: ${srcPathAbs}`
-          );
-        }
-
-        const srcPathBase = path.basename(srcPathAbs);
+        const srcPathBase = path.basename(WORD_DIR_PATH);
 
         await zipDir(srcPathBase, outPathAbs);
 
@@ -78,18 +80,22 @@ app.get("/v1", async (req, res) => {
         break;
 
       default:
-        //error
+        //error - handled by printLib & front 
         break;
     }
 
-    return res.status(200).send("File gen success!").download(resDownloadPath);
-    // return res.status(200).send("File gen success!");
+    return res.status(200).download(resDownloadPath);
   } catch (error) {
     console.error("Error calling printLib:\n", error);
     return res.status(500).send("Error processing request");
   }
 });
 
+/**
+ * Create zip files for 'dir' and 'recursive' linkType from the 'word' directory
+ * @param {string} srcPath - The source path to convert to .zip (relative only)
+ * @param {string} outPath - The dist path to store the converted files 
+ */
 async function zipDir(srcPath, outPath) {
   const archive = archiver("zip", { zlib: { level: 9 } });
   const writeStream = fs.createWriteStream(outPath);
@@ -116,6 +122,7 @@ async function zipDir(srcPath, outPath) {
 
   await Promise.all([archivePromise, writeStreamPromise]);
 }
+
 app.listen(PORT, () => {
   console.log(`Server listening on PORT ${PORT}`);
 });
