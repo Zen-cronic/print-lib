@@ -1,2 +1,2 @@
 
-CACHE_REQUEST=true
+CACHE_REQUEST=false

@@ -2,6 +2,7 @@ const path = require("path");
 const cp = require("child_process");
 const util = require("util");
 const { platform } = require("process");
+const fs = require("node:fs/promises");
 
 const { RequestHandler } = require("./RequestHandler");
 const {
@@ -16,15 +17,17 @@ const {
 const { isCI } = require("./testUtils");
 
 const CODE_DIR_PATH = path.resolve(process.cwd(), "code");
-const WORD_DIR_PATH = path.resolve(process.cwd(), "word");
-const PDF_DIR_PATH = path.resolve(process.cwd(), "pdf");
+const HTML_DIR_PATH = path.resolve(process.cwd(), "html");
+
+// const WORD_DIR_PATH = path.resolve(process.cwd(), "word");
+// const PDF_DIR_PATH = path.resolve(process.cwd(), "pdf");
 const GITHUB_RATE_LIMIT_ENDPOINT = "https://api.github.com/rate_limit";
 
 module.exports = {
   printLib,
   CODE_DIR_PATH,
-  WORD_DIR_PATH,
-  PDF_DIR_PATH,
+  // WORD_DIR_PATH,
+  // PDF_DIR_PATH,
   execConversion,
   checkRateLimit,
 };
@@ -44,11 +47,19 @@ module.exports = {
  */
 async function printLib(opts) {
   try {
-    await cleanup(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
+    await cleanup(
+      CODE_DIR_PATH,
+      HTML_DIR_PATH
+      // WORD_DIR_PATH, PDF_DIR_PATH
+    );
 
     const url = transformUrlStr(opts.link);
 
-    ensureDirExists(CODE_DIR_PATH, WORD_DIR_PATH, PDF_DIR_PATH);
+    ensureDirExists(
+      CODE_DIR_PATH,
+      HTML_DIR_PATH
+      // WORD_DIR_PATH, PDF_DIR_PATH
+    );
 
     const reqHandler = new RequestHandler(opts.auth, opts.userAgent);
 
@@ -67,9 +78,28 @@ async function printLib(opts) {
         throw new Error(`Unsupported linkType: ${opts.linkType}`);
     }
 
-    await execConversion(opts.convertTo);
+    // await execConversion(opts.convertTo);
+
+    const files = await fs.readdir(CODE_DIR_PATH, { recursive: true });
+    console.log({ files });
+
+    for (const f of files) {
+      const absPath = path.resolve(process.cwd(), CODE_DIR_PATH, f);
+      const contentStr = await fs.readFile(absPath, { encoding: "utf-8" });
+
+      const contentHtml = `<html><body><code><pre>${contentStr}</pre></code></body></html>`;
+
+      const absHtmlPath = path.resolve(
+        process.cwd(),
+        HTML_DIR_PATH,
+        f + ".html"
+      );
+
+      await fs.writeFile(absHtmlPath, contentHtml, { encoding: "utf-8" });
+    }
   } catch (error) {
-    throw error;
+    console.error(error);
+    // throw error;
   }
 }
 
