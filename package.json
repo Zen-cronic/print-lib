@@ -1,6 +1,6 @@
 {
   "name": "print-lib",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Print a GitHub repository's code as .docx or .pdf files",
   "author": "Kaung Zin Hein",
   "license": "MIT",
