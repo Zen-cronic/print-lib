@@ -15,7 +15,7 @@ This is my attempt to automate the menial process. Of course, screen time is ine
 # Installation
 
 1. `$ npm install print-lib`
-2. `$ pip install -r requirements.txt`
+2. `$ pip install -r node_modules/print-lib/requirements.txt`
 
 # Requirements 
 
