@@ -1,3 +1,4 @@
+require("jest-to-log");
 const { describe, it, expect } = require("@jest/globals");
 const { toNumber, formatDate } = require("../../src/utils");
 const { handleRateLimit } = require("../../src/RequestHandler");
@@ -34,6 +35,10 @@ describe("handleRateLimit function", () => {
         remaining: 2500,
         resource: "core",
       };
+
+      expect(handleRateLimit.bind(null, headers)).toLogErrorOrWarn(
+        "You've made 50% of endpoint requests" + "\n"
+      );
 
       expect(result).toStrictEqual(expected);
     });

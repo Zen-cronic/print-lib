@@ -13,7 +13,6 @@ const config = {
   ],
   testPathIgnorePatterns: [CACHE_REQUEST_REPORTER_PATH],
   setupFiles: ["dotenv/config"],
-  injectGlobals: false,
   
 };
 
